@@ -1,0 +1,35 @@
+1、DELIVERY
+a.
+SELECT no_o_id " +
+		"    FROM bmsql_new_order " +
+		"    WHERE no_w_id = ? AND no_d_id = ? " +
+		"    ORDER BY no_o_id ASC"
+
+b.
+DELETE FROM bmsql_new_order " +
+		"    WHERE no_w_id = ? AND no_d_id = ? AND no_o_id = ?"
+
+c.
+UPDATE bmsql_oorder " +
+		"    SET o_carrier_id = ? " +
+		"    WHERE o_w_id = ? AND o_d_id = ? AND o_id = ?
+d.
+SELECT o_c_id " +
+		"    FROM bmsql_oorder " +
+		"    WHERE o_w_id = ? AND o_d_id = ? AND o_id = ?
+		
+e.
+"UPDATE bmsql_order_line " +
+		"    SET ol_delivery_d = ? " +
+		"    WHERE ol_w_id = ? AND ol_d_id = ? AND ol_o_id = ?
+		
+f.
+SELECT sum(ol_amount) AS sum_ol_amount " +
+		"    FROM bmsql_order_line " +
+		"    WHERE ol_w_id = ? AND ol_d_id = ? AND ol_o_id = ?
+		
+g.
+UPDATE bmsql_customer " +
+		"    SET c_balance = c_balance + ?, " +
+		"        c_delivery_cnt = c_delivery_cnt + 1 " +
+		"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ?")

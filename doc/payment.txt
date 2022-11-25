@@ -1,0 +1,57 @@
+1、PAYMENT
+   //每个事物有15%的概率，支付的非该事务关联的warehouse
+   a.
+   //更新distinct所有订单总金额
+   UPDATE bmsql_district " +
+   		"    SET d_ytd = d_ytd + ? " +
+   		"    WHERE d_w_id = ? AND d_id = ?
+   b.
+   SELECT d_name, d_street_1, d_street_2, d_city, " +
+   		"       d_state, d_zip " +
+   		"    FROM bmsql_district " +
+   		"    WHERE d_w_id = ? AND d_id = ?"
+   c.
+   //更新warehouse所有订单总金额
+   UPDATE bmsql_warehouse " +
+   		"    SET w_ytd = w_ytd + ? " +
+   		"    WHERE w_id = ?
+   d.
+   SELECT w_name, w_street_1, w_street_2, w_city, " +
+   		"       w_state, w_zip " +
+   		"    FROM bmsql_warehouse " +
+   		"    WHERE w_id = ? ")
+   e.
+   //60%的概率会执行该语句
+   SELECT c_id " +
+   		"    FROM bmsql_customer " +
+   		"    WHERE c_w_id = ? AND c_d_id = ? AND c_last = ? " +
+   		"    ORDER BY c_first")
+   		
+   f.
+   SELECT c_first, c_middle, c_last, c_street_1, c_street_2, " +
+   		"       c_city, c_state, c_zip, c_phone, c_since, c_credit, " +
+   		"       c_credit_lim, c_discount, c_balance " +
+   		"    FROM bmsql_customer " +
+   		"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ? " +
+   		"    FOR UPDATE"
+   	h.
+   	//如果customer with good credit
+   	UPDATE bmsql_customer " +
+    		"    SET c_balance = c_balance - ?, " +
+    		"        c_ytd_payment = c_ytd_payment + ?, " +
+    		"        c_payment_cnt = c_payment_cnt + 1 " +
+    		"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ?"
+    //如果customer whith bad credit
+    UPDATE bmsql_customer " +
+    		"    SET c_balance = c_balance - ?, " +
+    		"        c_ytd_payment = c_ytd_payment + ?, " +
+    		"        c_payment_cnt = c_payment_cnt + 1, " +
+    		"        c_data = ? " +
+    		"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ?
+    i.
+    //更新历史记录表
+    INSERT INTO bmsql_history (" +
+    		"    h_c_id, h_c_d_id, h_c_w_id, h_d_id, h_w_id, " +
+    		"    h_date, h_amount, h_data) " +
+    		"VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+   

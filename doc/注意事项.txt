@@ -1,0 +1,49 @@
+1、
+需要用到索引的事务及SQL：
+PAYMENT:
+需要用到索引查询
+SELECT c_id " +
+   		"    FROM bmsql_customer " +
+   		"    WHERE c_w_id = ? AND c_d_id = ? AND c_last = ? " +
+   		"    ORDER BY c_first")
+   		
+DELIVERY:
+需要用到唯一索引约束，否则可能导致同一个订单被delivery 2次
+UPDATE bmsql_oorder " +
+		"    SET o_carrier_id = ? " +
+		"    WHERE o_w_id = ? AND o_d_id = ? AND o_id = ?
+
+ORDER STATUS：
+需要用到索引查询：
+SELECT c_id " +
+		"    FROM bmsql_customer " +
+		"    WHERE c_w_id = ? AND c_d_id = ? AND c_last = ? " +
+		"    ORDER BY c_first")
+
+2、
+按照我们的隔离级别的话，NewOrder的失败率可能会相对较高
+
+3、select for update
+NEW ORDER:
+SELECT d_tax, d_next_o_id " +
+   		"    FROM bmsql_district " +
+   		"    WHERE d_w_id = ? AND d_id = ? " +
+   		"    FOR UPDATE"
+   		
+SELECT s_quantity, s_data, " +
+     		"       s_dist_01, s_dist_02, s_dist_03, s_dist_04, " +
+     		"       s_dist_05, s_dist_06, s_dist_07, s_dist_08, " +
+     		"       s_dist_09, s_dist_10 " +
+     		"    FROM bmsql_stock " +
+     		"    WHERE s_w_id = ? AND s_i_id = ? " +
+     		"    FOR UPDATE")
+
+PAYMENT:
+SELECT c_first, c_middle, c_last, c_street_1, c_street_2, " +
+   		"       c_city, c_state, c_zip, c_phone, c_since, c_credit, " +
+   		"       c_credit_lim, c_discount, c_balance " +
+   		"    FROM bmsql_customer " +
+   		"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ? " +
+   		"    FOR UPDATE"
+
+

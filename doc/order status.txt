@@ -1,0 +1,34 @@
+1、ORDER STATUS
+事务最终会rollback
+a.
+//60%的概率会执行
+SELECT c_id " +
+		"    FROM bmsql_customer " +
+		"    WHERE c_w_id = ? AND c_d_id = ? AND c_last = ? " +
+		"    ORDER BY c_first")
+b.		
+SELECT c_first, c_middle, c_last, c_balance " +
+		"    FROM bmsql_customer " +
+		"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ?")
+		
+c.
+//查询该用户的最后一个订单
+SELECT o_id, o_entry_d, o_carrier_id " +
+		"    FROM bmsql_oorder " +
+		"    WHERE o_w_id = ? AND o_d_id = ? AND o_c_id = ? " +
+		"      AND o_id = (" +
+		"          SELECT max(o_id) " +
+		"              FROM bmsql_oorder " +
+		"              WHERE o_w_id = ? AND o_d_id = ? AND o_c_id = ?" +
+		"          )")
+SELECT o_id, o_entry_d, o_carrier_id FROM bmsql_oorder where o_w_id = 1 and o_d_id =1 and o_c_id =1 and
+o_id = (SELECT max(o_id) from bmsql_oorder where o_w_id = 1 and o_d_id = 1 and o_c_id =1);
+
+d.
+SELECT ol_i_id, ol_supply_w_id, ol_quantity, " +
+		"       ol_amount, ol_delivery_d " +
+		"    FROM bmsql_order_line " +
+		"    WHERE ol_w_id = ? AND ol_d_id = ? AND ol_o_id = ? " +
+		"    ORDER BY ol_w_id, ol_d_id, ol_o_id, ol_number");
+
+		

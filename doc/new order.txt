@@ -1,0 +1,65 @@
+1、NEW ORDER
+   每个NEW ORDER事务，都会新生成一个order表的记录
+   一个order的记录，随机关联5-15个order_line
+   一个order的记录，关联1个oorder记录
+   一个order的记录，随机管理一个districo_d_id）
+   一个order的记录，有2%的几率，需要从其他仓库仓发货（即订单中的o_w_id非该事务关联的w_id
+   一个order的记录关联的所有oreder_line都关联同一个随机的客户（）
+   一个order_line都随机关联一个商品item，商品数量，随机为1-10个
+   一个order_line的记录，有1%的概率关联的商品item不存在(即记录中ol_i_id的值，不在item表中)，会导致该事务失败
+   事务中执行的操作有：
+   a.
+   SELECT d_tax, d_next_o_id " +
+   		"    FROM bmsql_district " +
+   		"    WHERE d_w_id = ? AND d_id = ? " +
+   		"    FOR UPDATE"
+   b.
+   //需要用到索引
+   SELECT c_discount, c_last, c_credit, w_tax " +
+   		"    FROM bmsql_customer " +
+   		"    JOIN bmsql_warehouse ON (w_id = c_w_id) " +
+   		"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ?"
+   c.
+   UPDATE bmsql_district " +
+   		"    SET d_next_o_id = d_next_o_id + 1 " +
+   		"    WHERE d_w_id = ? AND d_id = ?");
+   d.
+   INSERT INTO bmsql_oorder (" +
+   		"    o_id, o_d_id, o_w_id, o_c_id, o_entry_d, " +
+   		"    o_ol_cnt, o_all_local) " +
+   		"VALUES (?, ?, ?, ?, ?, ?, ?)"
+   e.
+   INSERT INTO bmsql_new_order (" +
+   		"    no_o_id, no_d_id, no_w_id) " +
+   		"VALUES (?, ?, ?)"
+   		
+   f.
+   SELECT i_price, i_name, i_data " +
+   		"    FROM bmsql_item " +
+   		"    WHERE i_id = ?"
+   
+   g.SELECT s_quantity, s_data, " +
+     		"       s_dist_01, s_dist_02, s_dist_03, s_dist_04, " +
+     		"       s_dist_05, s_dist_06, s_dist_07, s_dist_08, " +
+     		"       s_dist_09, s_dist_10 " +
+     		"    FROM bmsql_stock " +
+     		"    WHERE s_w_id = ? AND s_i_id = ? " +
+     		"    FOR UPDATE")
+   h.
+   //batch update
+   UPDATE bmsql_stock " +
+   		"    SET s_quantity = ?, s_ytd = s_ytd + ?, " +
+   		"        s_order_cnt = s_order_cnt + 1, " +
+   		"        s_remote_cnt = s_remote_cnt + ? " +
+   		"    WHERE s_w_id = ? AND s_i_id = ?
+   		
+   i.
+   //batch insert
+   INSERT INTO bmsql_order_line (" +
+   		"    ol_o_id, ol_d_id, ol_w_id, ol_number, " +
+   		"    ol_i_id, ol_supply_w_id, ol_quantity, " +
+   		"    ol_amount, ol_dist_info) " +
+   		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+   
+   
+   

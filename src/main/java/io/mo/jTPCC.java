@@ -27,6 +27,7 @@ public class jTPCC implements jTPCCConfig
     private static String               resultDirName = null;
     private static BufferedWriter       resultCSV = null;
     private static BufferedWriter       runInfoCSV = null;
+	private static BufferedWriter       summaryCSV = null;
     private static int                  runID = 0;
 
     private int dbType = DB_UNKNOWN;
@@ -50,6 +51,8 @@ public class jTPCC implements jTPCCConfig
     private double tpmC;
     private jTPCCRandom rnd;
     private OSCollector osCollector = null;
+	
+	private StringBuffer summarySB = new StringBuffer();
 
     public static void main(String args[])
     {
@@ -192,7 +195,7 @@ public class jTPCC implements jTPCCConfig
 			File resultDataDir = new File(resultDir, "data");
 	
 			// Create the output directory structure.
-			if (!resultDir.mkdir())
+			if (!resultDir.mkdirs())
 			{
 			log.error("Failed to create directory '" +
 				  resultDir.getPath() + "'");
@@ -254,6 +257,23 @@ public class jTPCC implements jTPCCConfig
 			}
 			log.info("Term-00, writing per transaction results to " +
 				 resultCSVName);
+
+			// Open the tpcc summary.csv file.
+			String summaryCSVName = new File(resultDataDir, "summary.csv").getPath();
+			try
+			{
+				summaryCSV = new BufferedWriter(new FileWriter(summaryCSVName));
+				summaryCSV.write("run,db,sessionStart," +
+					"runMins," +
+					"loadWarehouses,runWarehouses,numSUTThreads," +
+					"limitTxnsPerMin," +
+					"TpmTOTAL,TpmC,TpmE\n");
+			}
+			catch (IOException e)
+			{
+				log.error(e.getMessage());
+				System.exit(1);
+			}
 	
 			if (osCollectorScript != null)
 			{
@@ -541,7 +561,16 @@ public class jTPCC implements jTPCCConfig
 							System.exit(1);
 						}
 					}
-		
+
+					summarySB.append(runID + ",");
+					summarySB.append(iDB + ",");
+					summarySB.append(new Timestamp(sessionStartTimestamp).toString() + ",");
+					summarySB.append(iRunMins + ",");
+					summarySB.append(loadWarehouses + ",");
+					summarySB.append(numWarehouses + ",");
+					summarySB.append(numTerminals + ",");
+					summarySB.append(Integer.parseInt(limPerMin) + ",");
+
 					synchronized(terminals)
 					{
 						printMessage("Starting all terminals...");
@@ -689,6 +718,10 @@ public class jTPCC implements jTPCCConfig
 		double tpmC = (6000000*fastNewOrderCounter/(currTimeMillis - sessionStartTimestamp))/100.0;
 		double tpmTotal = (6000000*transactionCount/(currTimeMillis - sessionStartTimestamp))/100.0;
 		double tpmE = (6000000*transactionErrorCount/(currTimeMillis - sessionStartTimestamp))/100.0;
+		summarySB.append(tpmTotal+",");
+		summarySB.append(tpmC+",");
+		summarySB.append(tpmE);
+		
 	
 		System.out.println("");
 		log.info("Term-00, ");
@@ -701,6 +734,22 @@ public class jTPCC implements jTPCCConfig
 		log.info("Term-00, Transaction Count = " + (transactionCount-1));
 		log.info("Term-00, Transaction Error = " + (transactionErrorCount));
 		log.info("Term-00, Transaction NewOrders = " + (fastNewOrderCounter));
+
+		// Record summary parameters in summary.csv
+		if (summaryCSV != null)
+		{
+			try
+			{
+				summaryCSV.write(summarySB.toString());
+				summaryCSV.close();
+			}
+			catch (Exception e)
+			{
+				log.error(e.getMessage());
+				System.exit(1);
+			}
+		}
+		
 
     }
 

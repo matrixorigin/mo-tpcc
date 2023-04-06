@@ -468,7 +468,7 @@ public class jTPCCTData
 	
 				// This ITEM should have been there.
 				throw new Exception("ITEM " + newOrder.ol_i_id[seq] +
-						" not fount");
+						" not found");
 		}
 		// Found ITEM
 		newOrder.i_name[seq] = rs.getString("i_name");
@@ -486,7 +486,7 @@ public class jTPCCTData
 		    throw new Exception("STOCK with" +
 				" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
 				" S_I_ID=" + newOrder.ol_i_id[seq] +
-				" not fount");
+				" not found");
 		}
 		newOrder.s_quantity[seq] = rs.getInt("s_quantity");
 		// Leave the ResultSet open ... we need it for the s_dist_NN.

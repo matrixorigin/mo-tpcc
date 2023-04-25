@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -499,7 +500,18 @@ public class jTPCC implements jTPCCConfig
 						String terminalName = "Term-" + (i>=9 ? ""+(i+1) : "0"+(i+1));
 						Connection conn = null;
 						printMessage("Creating database connection for " + terminalName + "...");
-						conn = DriverManager.getConnection(database, dbProps);
+						
+						try {
+							conn = DriverManager.getConnection(database, dbProps);
+						}catch (SQLException e){
+							errorMessage(String.format("Can not get valid connection from %s, user=%s, password=%s "
+									,database,dbProps.getProperty("user")
+							        ,dbProps.getProperty("password")));
+							errorMessage("The error message: \n" + e.getMessage());
+							errorMessage("The program now will stop, and please check the error");
+							System.exit(1);
+						}
+						
 						conn.setAutoCommit(false);
 		
 						jTPCCTerminal terminal = new jTPCCTerminal(terminalName, terminalWarehouseID, terminalDistrictID,

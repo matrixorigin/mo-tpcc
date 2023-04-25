@@ -1,17 +1,17 @@
 db=mo
 driver=com.mysql.cj.jdbc.Driver
-conn=jdbc:mysql://127.0.0.1:6001/tpcc?characterSetResults=utf8&continueBatchOnError=false&useServerPrepStmts=true&alwaysSendSetIsolation=false&useLocalSessionState=true&zeroDateTimeBehavior=CONVERT_TO_NULL&failoverReadOnly=false&serverTimezone=Asia/Shanghai&enabledTLSProtocols=TLSv1.2&useSSL=false
+conn=jdbc:mysql://127.0.0.1:6001/tpcc?characterSetResults=utf8&continueBatchOnError=false&useServerPrepStmts=true&alwaysSendSetIsolation=false&useLocalSessionState=true&zeroDateTimeBehavior=CONVERT_TO_NULL&failoverReadOnly=false&serverTimezone=Asia/Shanghai&useSSL=false&socketTimeout=30000
 user=dump
 password=111
 
 warehouses=1
 loadWorkers=4
 
-terminals=1
+terminals=5
 //To run specified transactions per terminal- runMins must equal zero
 runTxnsPerTerminal=0
 //To run for specified minutes- runTxnsPerTerminal must equal zero
-runMins=1
+runMins=10
 //Number of total transactions per minute
 limitTxnsPerMin=0
 
@@ -34,3 +34,7 @@ resultDirectory=./report/my_result_%tY-%tm-%td_%tH%tM%tS
 //osCollectorInterval=1
 //osCollectorSSHAddr=user@dbhost
 //osCollectorDevices=net_eth0 blk_sda
+
+//only matrixone
+//duaring the test, some errors are expected
+expectedErrorCodes=20619

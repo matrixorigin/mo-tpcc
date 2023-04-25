@@ -15,7 +15,14 @@ import java.util.Properties;
 public class jTPCCConnection
 {
     private Connection          dbConn = null;
-    private int                 dbType = 0;
+	
+	private String 				jdbcURL = null;
+	
+	private Properties 			dbProps = null;
+	
+	private boolean				valid = true;
+
+	private int                 dbType = 0;
 
     public PreparedStatement    stmtNewOrderSelectWhseCust;
     public PreparedStatement    stmtNewOrderSelectDist;
@@ -297,6 +304,56 @@ public class jTPCCConnection
     public void rollback()
 	throws SQLException
     {
-	dbConn.rollback();
+		dbConn.rollback();
     }
+	
+	public boolean isValid(){
+		return this.valid;
+	}
+	
+	public void checkStatus(){
+		try {
+			 if(this.dbConn.isClosed())
+				 this.valid = false;
+			 
+			 if(!this.dbConn.isValid(1))
+				 this.valid = false;
+			 
+		} catch (SQLException e) {
+			this.valid = false;
+		}
+	}
+
+	public boolean is(){
+		try {
+			return this.dbConn.isClosed();
+		} catch (SQLException e) {
+			return true;
+		}
+	}
+	
+	public void reConnect(){
+		for(int i = 0; i < 3; i++) {
+			try {
+				this.dbConn = DriverManager.getConnection(this.jdbcURL,this.dbProps);
+				this.valid = true;
+				break;
+			} catch (SQLException e) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+		}
+	}
+	
+
+	public void setJdbcURL(String URL) {
+		this.jdbcURL = URL;
+	}
+
+	public void setDbProps(Properties dbProps) {
+		this.dbProps = dbProps;
+	}
 }

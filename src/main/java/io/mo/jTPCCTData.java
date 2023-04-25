@@ -8,8 +8,11 @@ package io.mo;/*
 
 import org.apache.log4j.*;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.Formatter;
+import java.util.Properties;
 import java.util.Vector;
 
 public class jTPCCTData
@@ -54,10 +57,28 @@ public class jTPCCTData
     private DeliveryBGData      deliveryBG = null;
 
     private static Object       traceLock = new Object();
+	
+	private static String[] expectedECs = null;
+	
+	public jTPCCTData(){
+		Properties ini = new Properties();
+		try {
+			ini.load( new FileInputStream(System.getProperty("prop")));
+			String expectedErrorCodes = ini.getProperty("expectedErrorCodes");
+			if(expectedErrorCodes != null){
+				expectedECs = expectedErrorCodes.split(",");
+			}else {
+				expectedECs = new String[0];
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
     private StringBuffer        resultSB = new StringBuffer();
     private Formatter           resultFmt = new Formatter(resultSB);
-
+	
     public void setNumWarehouses(int num)
     {
 	numWarehouses = num;
@@ -366,9 +387,9 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			throw new SQLException("District for" +
+			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: District for" +
 				" W_ID=" + newOrder.w_id +
-				" D_ID=" + newOrder.d_id + " not found");
+				" D_ID=" + newOrder.d_id + " NOT FOUND");
 	    }
 	    newOrder.d_tax      = rs.getDouble("d_tax");
 	    newOrder.o_id       = rs.getInt("d_next_o_id");
@@ -384,10 +405,10 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			throw new SQLException("Warehouse or Customer for" +
+			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: Warehouse or Customer for" +
 				" W_ID=" + newOrder.w_id +
 				" D_ID=" + newOrder.d_id +
-				" C_ID=" + newOrder.c_id + " not found");
+				" C_ID=" + newOrder.c_id + " NOT FOUND");
 	    }
 	    newOrder.w_tax      = rs.getDouble("w_tax");
 	    newOrder.c_last     = rs.getString("c_last");
@@ -467,8 +488,8 @@ public class jTPCCTData
 				}
 	
 				// This ITEM should have been there.
-				throw new Exception("ITEM " + newOrder.ol_i_id[seq] +
-						" not found");
+				throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: ITEM " + newOrder.ol_i_id[seq] +
+						" NOT FOUND");
 		}
 		// Found ITEM
 		newOrder.i_name[seq] = rs.getString("i_name");
@@ -483,10 +504,10 @@ public class jTPCCTData
 		rs = stmt.executeQuery();
 		if (!rs.next())
 		{
-		    throw new Exception("STOCK with" +
+		    throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: STOCK with" +
 				" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
 				" S_I_ID=" + newOrder.ol_i_id[seq] +
-				" not found");
+				" NOT FOUND");
 		}
 		newOrder.s_quantity[seq] = rs.getInt("s_quantity");
 		// Leave the ResultSet open ... we need it for the s_dist_NN.
@@ -581,7 +602,11 @@ public class jTPCCTData
 //	    for (SQLException x = se; x != null; x = x.getNextException())
 //			log.error(x.getMessage());
 //	    se.printStackTrace();
-
+		db.checkStatus();
+		if(!db.isValid()){
+			throw new Exception("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection has not been valid, caused by:\n "+se.getMessage());
+		}
+		
 	    try
 	    {
 			db.stmtNewOrderUpdateStock.clearBatch();
@@ -590,12 +615,13 @@ public class jTPCCTData
 	    }
 	    catch (SQLException se2)
 	    {
-			throw new Exception("TT_NEW_ORDER: Unexpected SQLException on rollback: " +
-				se2.getMessage());
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 	    }
 		
-		throw new Exception("TT_NEW_ORDER: Unexpected SQLException on transaction execution: " +
-				se.getMessage());
+		if(isExpectedErrorCode(se.getErrorCode()))
+			throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: " + se.getMessage());
+		else
+			throw new Exception("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]]: " + se.getMessage());
 	}
 	catch (Exception e)
 	{
@@ -607,8 +633,7 @@ public class jTPCCTData
 	    }
 	    catch (SQLException se2)
 	    {
-			throw new Exception("TT_NEW_ORDER: Unexpected SQLException on rollback: " +
-					se2.getMessage());
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 	    }
 	    throw e;
 	}
@@ -779,9 +804,9 @@ public class jTPCCTData
 			if (!rs.next())
 			{
 				rs.close();
-				throw new Exception("District for" +
+				throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: District for" +
 					" W_ID=" + payment.w_id +
-					" D_ID=" + payment.d_id + " not found");
+					" D_ID=" + payment.d_id + " NOT FOUND");
 			}
 			payment.d_name = rs.getString("d_name");
 			payment.d_street_1 = rs.getString("d_street_1");
@@ -809,8 +834,8 @@ public class jTPCCTData
 			if (!rs.next())
 			{
 			rs.close();
-			throw new Exception("Warehouse for" +
-				" W_ID=" + payment.w_id + " not found");
+			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Warehouse for" +
+				" W_ID=" + payment.w_id + " NOT FOUND");
 			}
 			payment.w_name = rs.getString("w_name");
 			payment.w_street_1 = rs.getString("w_street_1");
@@ -845,10 +870,10 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					throw new Exception("Customer(s) for" +
+					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Customer(s) for" +
 						" C_W_ID=" + payment.c_w_id +
 						" C_D_ID=" + payment.c_d_id +
-						" C_LAST=" + payment.c_last + " not found");
+						" C_LAST=" + payment.c_last + " NOT FOUND");
 				}
 	
 				payment.c_id = c_id_list.get((c_id_list.size() + 1) / 2 - 1);
@@ -862,10 +887,10 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			throw new Exception("Customer for" +
+			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Customer for" +
 				" C_W_ID=" + payment.c_w_id +
 				" C_D_ID=" + payment.c_d_id +
-				" C_ID=" + payment.c_id + " not found");
+				" C_ID=" + payment.c_id + " NOT FOUND");
 			}
 			payment.c_first = rs.getString("c_first");
 			payment.c_middle = rs.getString("c_middle");
@@ -908,10 +933,10 @@ public class jTPCCTData
 				rs = stmt.executeQuery();
 				if (!rs.next())
 				{
-					throw new Exception("Customer.c_data for" +
+					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Customer.c_data for" +
 					" C_W_ID=" + payment.c_w_id +
 					" C_D_ID=" + payment.c_d_id +
-					" C_ID=" + payment.c_id + " not found");
+					" C_ID=" + payment.c_id + " NOT FOUND");
 				}
 				payment.c_data = rs.getString("c_data");
 				rs.close();
@@ -960,18 +985,24 @@ public class jTPCCTData
 //			for (SQLException x = se; x != null; x = x.getNextException())
 //				log.error(x.getMessage());
 //			se.printStackTrace();
+			db.checkStatus();
+			if(!db.isValid()){
+				throw new Exception("[UNEXPECTED][TT_PAYMENT][CONNECTION] The connection has not been valid, caused by:\n "+se.getMessage());
+			}
 	
 			try
 			{
-			db.rollback();
+				db.rollback();
 			}
 			catch (SQLException se2)
 			{
-			throw new Exception("TT_PAYMENT: Unexpected SQLException on rollback: " +
-					se2.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 			}
-			throw new Exception("TT_PAYMENT: Unexpected SQLException on transaction execution: " +
-					se.getMessage());
+
+			if(isExpectedErrorCode(se.getErrorCode()))
+				throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: " + se.getMessage());
+			else
+				throw new Exception("[UNEXPECTED][TT_PAYMENT][EXECUTION]]: " + se.getMessage());
 			
 		}
 		catch (Exception e)
@@ -982,8 +1013,7 @@ public class jTPCCTData
 			}
 			catch (SQLException se2)
 			{
-			throw new Exception("TT_PAYMENT: Unexpected SQLException on rollback: " +
-					se2.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 			}
 			throw e;
 		}
@@ -1171,10 +1201,10 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					throw new Exception("Customer(s) for" +
+					throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: Customer(s) for" +
 						" C_W_ID=" + orderStatus.w_id +
 						" C_D_ID=" + orderStatus.d_id +
-						" C_LAST=" + orderStatus.c_last + " not found");
+						" C_LAST=" + orderStatus.c_last + " NOT FOUND");
 				}
 	
 				orderStatus.c_id = c_id_list.get((c_id_list.size() + 1) / 2 - 1);
@@ -1188,10 +1218,10 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				throw new Exception("Customer for" +
+				throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: Customer for" +
 					" C_W_ID=" + orderStatus.w_id +
 					" C_D_ID=" + orderStatus.d_id +
-					" C_ID=" + orderStatus.c_id + " not found");
+					" C_ID=" + orderStatus.c_id + " NOT FOUND");
 			}
 			orderStatus.c_first = rs.getString("c_first");
 			orderStatus.c_middle = rs.getString("c_middle");
@@ -1211,10 +1241,10 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			throw new Exception("Last Order for" +
+			throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: Last Order for" +
 				" W_ID=" + orderStatus.w_id +
 				" D_ID=" + orderStatus.d_id +
-				" C_ID=" + orderStatus.c_id + " not found");
+				" C_ID=" + orderStatus.c_id + " NOT FOUND");
 			}
 			orderStatus.o_id = rs.getInt("o_id");
 			orderStatus.o_entry_d = rs.getTimestamp("o_entry_d").toString();
@@ -1263,19 +1293,25 @@ public class jTPCCTData
 //			for (SQLException x = se; x != null; x = x.getNextException())
 //				log.error(x.getMessage());
 //			se.printStackTrace();
-	
+
+			db.checkStatus();
+			if(!db.isValid()){
+				throw new Exception("[UNEXPECTED][ORDER_STATUS][CONNECTION] The connection has not been valid, caused by:\n "+se.getMessage());
+			}
+			
 			try
 			{
-			db.rollback();
+				db.rollback();
 			}
 			catch (SQLException se2)
 			{
-			throw new Exception("ORDER_STATUS: Unexpected SQLException on rollback: " +
-					se2.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 			}
 
-			throw new Exception("ORDER_STATUS: Unexpected SQLException on transaction execution: " +
-					se.getMessage());
+			if(isExpectedErrorCode(se.getErrorCode()))
+				throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: " + se.getMessage());
+			else
+				throw new Exception("[UNEXPECTED][ORDER_STATUS][EXECUTION]]: " + se.getMessage());
 		}
 	catch (Exception e)
 	{
@@ -1285,8 +1321,7 @@ public class jTPCCTData
 	    }
 	    catch (SQLException se2)
 	    {
-		throw new Exception("ORDER_STATUS: Unexpected SQLException on rollback: " +
-				se2.getMessage());
+			throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 	    }
 	    throw e;
 	}
@@ -1422,30 +1457,34 @@ public class jTPCCTData
 //			for (SQLException x = se; x != null; x = x.getNextException())
 //				log.error(x.getMessage());
 //			se.printStackTrace();
-	
+			db.checkStatus();
+			if(!db.isValid()){
+				throw new Exception("[UNEXPECTED][STOCK_LEVEL][CONNECTION] The connection has not been valid, caused by:\n "+se.getMessage());
+			}
+			
 			try
 			{
 				db.rollback();
 			}
 			catch (SQLException se2)
 			{
-				throw new Exception("STOCK_LEVEL: Unexpected SQLException on rollback: " +
-					se2.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 			}
 
-			throw new Exception("STOCK_LEVEL: Unexpected SQLException on transaction execution: " +
-					se.getMessage());
+			if(isExpectedErrorCode(se.getErrorCode()))
+				throw new Exception("[EXPECTED][STOCK_LEVEL][EXECUTION]]: " + se.getMessage());
+			else
+				throw new Exception("[UNEXPECTED][STOCK_LEVEL][EXECUTION]]: " + se.getMessage());
 		}
 		catch (Exception e)
 		{
 			try
 			{
-			db.rollback();
+				db.rollback();
 			}
 			catch (SQLException se2)
 			{
-			throw new Exception("STOCK_LEVEL: Unexpected SQLException on rollback: " +
-					se2.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
 			}
 			throw e;
 		}
@@ -1698,10 +1737,10 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    throw new Exception("ORDER in DELIVERY_BG for" +
+		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]]: ORDER in DELIVERY_BG for" +
 			" O_W_ID=" + deliveryBG.w_id +
 			" O_D_ID=" + d_id +
-			" O_ID=" + o_id + " not found");
+			" O_ID=" + o_id + " NOT FOUND");
 		}
 		c_id = rs.getInt("o_c_id");
 		rs.close();
@@ -1723,10 +1762,10 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    throw new Exception("sum(OL_AMOUNT) for ORDER_LINEs with " +
+		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]]: sum(OL_AMOUNT) for ORDER_LINEs with " +
 			" OL_W_ID=" + deliveryBG.w_id +
 			" OL_D_ID=" + d_id +
-			" OL_O_ID=" + o_id + " not found");
+			" OL_O_ID=" + o_id + " NOT FOUND");
 		}
 		sum_ol_amount = rs.getDouble("sum_ol_amount");
 		rs.close();
@@ -1751,34 +1790,38 @@ public class jTPCCTData
 //	    for (SQLException x = se; x != null; x = x.getNextException())
 //			log.error(x.getMessage());
 //	    se.printStackTrace();
-
+		db.checkStatus();
+		if(!db.isValid()){
+			throw new Exception("[UNEXPECTED][DELIVERY_BG][CONNECTION] The connection has not been valid, caused by:\n "+se.getMessage());
+		}
+		
 	    try
 	    {
-		db.rollback();
+			db.rollback();
 	    }
-	    catch (SQLException se2)
-	    {
-		throw new Exception("DELIVERY_BG: Unexpected SQLException on rollback: " +
-				se2.getMessage());
-	    }
+		catch (SQLException se2)
+		{
+			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+		}
 
-		throw new Exception("DELIVERY_BG: Unexpected SQLException on transaction execution: " +
-				se.getMessage());
+		if(isExpectedErrorCode(se.getErrorCode()))
+			throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]]: " + se.getMessage());
+		else
+			throw new Exception("[UNEXPECTED][DELIVERY_BG][EXECUTION]]: " + se.getMessage());
 	}
 	catch (Exception e)
 	{
 	    try
 	    {
-		db.rollback();
+			db.rollback();
 	    }
 	    catch (SQLException se2)
 	    {
-		throw new Exception("DELIVERY_BG: Unexpected SQLException on rollback: " +
-				se2.getMessage());
-	    }
+			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+		}
 	    throw e;
+		}
 	}
-    }
 
     private void traceDeliveryBG(Logger log, Formatter fmt[])
     {
@@ -1824,4 +1867,16 @@ public class jTPCCTData
 
 	public int      delivered_o_id[];
     }
+	
+	private boolean isExpectedErrorCode(int code){
+		if(expectedECs.length == 0)
+			return false;
+		
+		for(int i = 0; i < expectedECs.length; i++){
+			if(expectedECs[i].equalsIgnoreCase(String.valueOf(code)))
+				return true;
+		}
+		
+		return false;
+	}
 }

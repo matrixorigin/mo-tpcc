@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 
 public class jTPCCTerminal implements jTPCCConfig, Runnable
@@ -84,6 +85,48 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
 		terminalMessage("Terminal \'" + terminalName + "\' has WarehouseID=" + terminalWarehouseID + " and DistrictID=" + terminalDistrictID + ".");
 		terminalStartTime = System.currentTimeMillis();
     }
+
+	public jTPCCTerminal
+			(String terminalName, int terminalWarehouseID, int terminalDistrictID,
+			 Connection conn, int dbType,
+			 int numTransactions, boolean terminalWarehouseFixed,
+			 int paymentWeight, int orderStatusWeight,
+			 int deliveryWeight, int stockLevelWeight, int numWarehouses, int limPerMin_Terminal,
+			 String jdbcURL, Properties dbProps, jTPCC parent) throws SQLException
+	{
+		this.terminalName = terminalName;
+		this.conn = conn;
+		this.dbType = dbType;
+		this.stmt = conn.createStatement();
+		this.stmt.setMaxRows(200);
+		this.stmt.setFetchSize(100);
+
+		this.stmt1 = conn.createStatement();
+		this.stmt1.setMaxRows(1);
+
+		this.terminalWarehouseID = terminalWarehouseID;
+		this.terminalDistrictID = terminalDistrictID;
+		this.terminalWarehouseFixed = terminalWarehouseFixed;
+		this.parent = parent;
+		this.rnd = parent.getRnd().newRandom();
+		this.numTransactions = numTransactions;
+		this.paymentWeight = paymentWeight;
+		this.orderStatusWeight = orderStatusWeight;
+		this.deliveryWeight = deliveryWeight;
+		this.stockLevelWeight = stockLevelWeight;
+		this.numWarehouses = numWarehouses;
+		this.newOrderCounter = 0;
+		this.limPerMin_Terminal = limPerMin_Terminal;
+
+		this.db = new jTPCCConnection(conn, dbType);
+		
+		this.db.setJdbcURL(jdbcURL);
+		this.db.setDbProps(dbProps);
+
+		terminalMessage("");
+		terminalMessage("Terminal \'" + terminalName + "\' has WarehouseID=" + terminalWarehouseID + " and DistrictID=" + terminalDistrictID + ".");
+		terminalStartTime = System.currentTimeMillis();
+	}
 
     public void run()
     {
@@ -320,13 +363,21 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
 				}
 			}
 			if(stopRunningSignal) stopRunning = true;
+			if(!db.isValid()) {
+				db.reConnect();
+				if(!db.isValid()){
+					log.error("Terminal \'" + terminalName + "\'" + " can not get valid connection" +
+							", this terminal will stop....");
+					stopRunning = true;
+				}
+			}
 		}
     }
 
 
     private void error(String type) {
       log.error(terminalName + ", TERMINAL=" + terminalName + "  TYPE=" + type + "  COUNT=" + transactionCount);
-	System.out.println(terminalName + ", TERMINAL=" + terminalName + "  TYPE=" + type + "  COUNT=" + transactionCount);
+	  //System.out.println(terminalName + ", TERMINAL=" + terminalName + "  TYPE=" + type + "  COUNT=" + transactionCount);
     }
 
 

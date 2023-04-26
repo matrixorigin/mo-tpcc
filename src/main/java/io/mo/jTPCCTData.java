@@ -619,9 +619,9 @@ public class jTPCCTData
 	    }
 		
 		if(isExpectedErrorCode(se.getErrorCode()))
-			throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: " + se.getMessage());
+			throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 		else
-			throw new Exception("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]]: " + se.getMessage());
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 	}
 	catch (Exception e)
 	{
@@ -1000,9 +1000,9 @@ public class jTPCCTData
 			}
 
 			if(isExpectedErrorCode(se.getErrorCode()))
-				throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: " + se.getMessage());
+				throw new Exception(String.format("[EXPECTED][TT_PAYMENT][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 			else
-				throw new Exception("[UNEXPECTED][TT_PAYMENT][EXECUTION]]: " + se.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 			
 		}
 		catch (Exception e)
@@ -1309,9 +1309,9 @@ public class jTPCCTData
 			}
 
 			if(isExpectedErrorCode(se.getErrorCode()))
-				throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: " + se.getMessage());
+				throw new Exception(String.format("[EXPECTED][ORDER_STATUS][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 			else
-				throw new Exception("[UNEXPECTED][ORDER_STATUS][EXECUTION]]: " + se.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 		}
 	catch (Exception e)
 	{
@@ -1472,9 +1472,9 @@ public class jTPCCTData
 			}
 
 			if(isExpectedErrorCode(se.getErrorCode()))
-				throw new Exception("[EXPECTED][STOCK_LEVEL][EXECUTION]]: " + se.getMessage());
+				throw new Exception(String.format("[EXPECTED][STOCK_LEVEL][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 			else
-				throw new Exception("[UNEXPECTED][STOCK_LEVEL][EXECUTION]]: " + se.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 		}
 		catch (Exception e)
 		{
@@ -1805,9 +1805,9 @@ public class jTPCCTData
 		}
 
 		if(isExpectedErrorCode(se.getErrorCode()))
-			throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]]: " + se.getMessage());
+			throw new Exception(String.format("[EXPECTED][DELIVERY_BG][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 		else
-			throw new Exception("[UNEXPECTED][DELIVERY_BG][EXECUTION]]: " + se.getMessage());
+			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
 	}
 	catch (Exception e)
 	{

@@ -21,6 +21,7 @@ function checkError() {
       result=`grep "UNEXPECTED" ${WORKSPACE}/benchmarksql-error.log`
       if [ "${result}"x != x ];then
         echo "There are some unexpected error in benchmarksql-error.log."
+        echo ${result}
         return 1;
       fi
     fi 

@@ -387,7 +387,7 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: District for" +
+			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]: District for" +
 				" W_ID=" + newOrder.w_id +
 				" D_ID=" + newOrder.d_id + " NOT FOUND");
 	    }
@@ -405,7 +405,7 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: Warehouse or Customer for" +
+			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
 				" W_ID=" + newOrder.w_id +
 				" D_ID=" + newOrder.d_id +
 				" C_ID=" + newOrder.c_id + " NOT FOUND");
@@ -488,7 +488,7 @@ public class jTPCCTData
 				}
 	
 				// This ITEM should have been there.
-				throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: ITEM " + newOrder.ol_i_id[seq] +
+				throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
 						" NOT FOUND");
 		}
 		// Found ITEM
@@ -504,7 +504,7 @@ public class jTPCCTData
 		rs = stmt.executeQuery();
 		if (!rs.next())
 		{
-		    throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: STOCK with" +
+		    throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
 				" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
 				" S_I_ID=" + newOrder.ol_i_id[seq] +
 				" NOT FOUND");
@@ -615,13 +615,13 @@ public class jTPCCTData
 	    }
 	    catch (SQLException se2)
 	    {
-			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 	    }
 		
 		if(isExpectedErrorCode(se.getErrorCode()))
-			throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+			throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 		else
-			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 	}
 	catch (Exception e)
 	{
@@ -633,7 +633,7 @@ public class jTPCCTData
 	    }
 	    catch (SQLException se2)
 	    {
-			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 	    }
 	    throw e;
 	}
@@ -804,7 +804,7 @@ public class jTPCCTData
 			if (!rs.next())
 			{
 				rs.close();
-				throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: District for" +
+				throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: District for" +
 					" W_ID=" + payment.w_id +
 					" D_ID=" + payment.d_id + " NOT FOUND");
 			}
@@ -834,7 +834,7 @@ public class jTPCCTData
 			if (!rs.next())
 			{
 			rs.close();
-			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Warehouse for" +
+			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Warehouse for" +
 				" W_ID=" + payment.w_id + " NOT FOUND");
 			}
 			payment.w_name = rs.getString("w_name");
@@ -870,7 +870,7 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Customer(s) for" +
+					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Customer(s) for" +
 						" C_W_ID=" + payment.c_w_id +
 						" C_D_ID=" + payment.c_d_id +
 						" C_LAST=" + payment.c_last + " NOT FOUND");
@@ -887,7 +887,7 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Customer for" +
+			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Customer for" +
 				" C_W_ID=" + payment.c_w_id +
 				" C_D_ID=" + payment.c_d_id +
 				" C_ID=" + payment.c_id + " NOT FOUND");
@@ -933,7 +933,7 @@ public class jTPCCTData
 				rs = stmt.executeQuery();
 				if (!rs.next())
 				{
-					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]]: Customer.c_data for" +
+					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Customer.c_data for" +
 					" C_W_ID=" + payment.c_w_id +
 					" C_D_ID=" + payment.c_d_id +
 					" C_ID=" + payment.c_id + " NOT FOUND");
@@ -996,13 +996,13 @@ public class jTPCCTData
 			}
 			catch (SQLException se2)
 			{
-				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 			}
 
 			if(isExpectedErrorCode(se.getErrorCode()))
-				throw new Exception(String.format("[EXPECTED][TT_PAYMENT][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+				throw new Exception(String.format("[EXPECTED][TT_PAYMENT][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 			else
-				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 			
 		}
 		catch (Exception e)
@@ -1013,7 +1013,7 @@ public class jTPCCTData
 			}
 			catch (SQLException se2)
 			{
-				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 			}
 			throw e;
 		}
@@ -1201,7 +1201,7 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: Customer(s) for" +
+					throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]: Customer(s) for" +
 						" C_W_ID=" + orderStatus.w_id +
 						" C_D_ID=" + orderStatus.d_id +
 						" C_LAST=" + orderStatus.c_last + " NOT FOUND");
@@ -1218,7 +1218,7 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: Customer for" +
+				throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]: Customer for" +
 					" C_W_ID=" + orderStatus.w_id +
 					" C_D_ID=" + orderStatus.d_id +
 					" C_ID=" + orderStatus.c_id + " NOT FOUND");
@@ -1241,7 +1241,7 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]]: Last Order for" +
+			throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]: Last Order for" +
 				" W_ID=" + orderStatus.w_id +
 				" D_ID=" + orderStatus.d_id +
 				" C_ID=" + orderStatus.c_id + " NOT FOUND");
@@ -1305,13 +1305,13 @@ public class jTPCCTData
 			}
 			catch (SQLException se2)
 			{
-				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 			}
 
 			if(isExpectedErrorCode(se.getErrorCode()))
-				throw new Exception(String.format("[EXPECTED][ORDER_STATUS][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+				throw new Exception(String.format("[EXPECTED][ORDER_STATUS][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 			else
-				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 		}
 	catch (Exception e)
 	{
@@ -1321,7 +1321,7 @@ public class jTPCCTData
 	    }
 	    catch (SQLException se2)
 	    {
-			throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+			throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 	    }
 	    throw e;
 	}
@@ -1468,13 +1468,13 @@ public class jTPCCTData
 			}
 			catch (SQLException se2)
 			{
-				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 			}
 
 			if(isExpectedErrorCode(se.getErrorCode()))
-				throw new Exception(String.format("[EXPECTED][STOCK_LEVEL][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+				throw new Exception(String.format("[EXPECTED][STOCK_LEVEL][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 			else
-				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 		}
 		catch (Exception e)
 		{
@@ -1484,7 +1484,7 @@ public class jTPCCTData
 			}
 			catch (SQLException se2)
 			{
-				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 			}
 			throw e;
 		}
@@ -1737,7 +1737,7 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]]: ORDER in DELIVERY_BG for" +
+		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]: ORDER in DELIVERY_BG for" +
 			" O_W_ID=" + deliveryBG.w_id +
 			" O_D_ID=" + d_id +
 			" O_ID=" + o_id + " NOT FOUND");
@@ -1762,7 +1762,7 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]]: sum(OL_AMOUNT) for ORDER_LINEs with " +
+		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]: sum(OL_AMOUNT) for ORDER_LINEs with " +
 			" OL_W_ID=" + deliveryBG.w_id +
 			" OL_D_ID=" + d_id +
 			" OL_O_ID=" + o_id + " NOT FOUND");
@@ -1801,13 +1801,13 @@ public class jTPCCTData
 	    }
 		catch (SQLException se2)
 		{
-			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 		}
 
 		if(isExpectedErrorCode(se.getErrorCode()))
-			throw new Exception(String.format("[EXPECTED][DELIVERY_BG][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+			throw new Exception(String.format("[EXPECTED][DELIVERY_BG][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 		else
-			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][EXECUTION]]: ErrorCode=%d, ErrorMessage=%s",se.getErrorCode(),se.getMessage()));
+			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 	}
 	catch (Exception e)
 	{
@@ -1817,7 +1817,7 @@ public class jTPCCTData
 	    }
 	    catch (SQLException se2)
 	    {
-			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][ROLLBACK]: ErrorCode=%d, ErrorMessage=%s",se2.getErrorCode(),se2.getMessage()));
+			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
 		}
 	    throw e;
 		}

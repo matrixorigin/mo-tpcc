@@ -9,6 +9,8 @@ package io.mo;/*
  *
  */
 
+import org.apache.log4j.Logger;
+
 import java.sql.*;
 import java.util.Properties;
 
@@ -62,6 +64,8 @@ public class jTPCCConnection
 	
 	//test code
 	public Statement stmtSumDistrict;
+
+	private static org.apache.log4j.Logger log = Logger.getLogger(jTPCCConnection.class);
 
     public jTPCCConnection(Connection dbConn, int dbType)
 	throws SQLException
@@ -320,6 +324,7 @@ public class jTPCCConnection
 				 this.valid = false;
 			 
 		} catch (SQLException e) {
+			log.error("The connection has been lost, caused by: " + e.getMessage());
 			this.valid = false;
 		}
 	}

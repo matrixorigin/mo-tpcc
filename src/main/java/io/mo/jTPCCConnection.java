@@ -317,11 +317,15 @@ public class jTPCCConnection
 	
 	public void checkStatus(){
 		try {
-			 if(this.dbConn.isClosed())
+			 if(this.dbConn.isClosed()) {
+				 log.error("The connection has been closed.");
 				 this.valid = false;
+			 }
 			 
-			 if(!this.dbConn.isValid(1))
+			 if(!this.dbConn.isValid(30)) {
+				 log.error("The connection has not been valid.");
 				 this.valid = false;
+			 }
 			 
 		} catch (SQLException e) {
 			log.error("The connection has been lost, caused by: " + e.getMessage());

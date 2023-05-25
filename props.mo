@@ -38,3 +38,8 @@ resultDirectory=./report/my_result_%tY-%tm-%td_%tH%tM%tS
 //only matrixone
 //duaring the test, some errors are expected
 expectedErrorCodes=20619
+
+//only for profile collection
+profAddr=127.0.0.1
+profPort=6060
+profThink=120

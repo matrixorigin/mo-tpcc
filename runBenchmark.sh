@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-if [ $# -ne 1 ] ; then
+if [[ $# -gt 2 || $# -lt 1 ]] ; then
     echo "usage: $(basename $0) PROPS_FILE" >&2
+    echo "usage: $(basename $0) PROPS_FILE PROFILE" >&2
     exit 2
 fi
 
@@ -18,5 +19,9 @@ setCP || exit 1
 
 myOPTS="-Dprop=$1 -DrunID=${SEQ}"
 echo "$myCP"
+
+if [ $2 == "PROFILE" ]; then
+  nohup ./profile.sh $1 > profile.log &
+fi
 
 java -cp "$myCP" $myOPTS io.mo.jTPCC 

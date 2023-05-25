@@ -28,6 +28,7 @@ public class jTPCC implements jTPCCConfig
     private static String               resultDirName = null;
     private static BufferedWriter       resultCSV = null;
     private static BufferedWriter       runInfoCSV = null;
+	private static BufferedWriter       currentReportPathFile = null;
 	private static BufferedWriter       summaryCSV = null;
     private static int                  runID = 0;
 
@@ -208,6 +209,24 @@ public class jTPCC implements jTPCCConfig
 				  resultDataDir.getPath() + "'");
 			System.exit(1);
 			}
+			
+			//Create .run file
+			String currentReportPathFileName = new File("report", ".run").getPath();
+			try
+			{
+				currentReportPathFile = new BufferedWriter(
+						new FileWriter(currentReportPathFileName));
+				currentReportPathFile.write(resultDirName);
+				currentReportPathFile.flush();
+				currentReportPathFile.close();
+			}
+			catch (IOException e)
+			{
+				log.error(e.getMessage());
+				System.exit(1);
+			}
+			log.info("Term-00, created " + currentReportPathFileName + " for runID " +
+					runID);
 	
 			// Copy the used properties file into the resultDirectory.
 			try

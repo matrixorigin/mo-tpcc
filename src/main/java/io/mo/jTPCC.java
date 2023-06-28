@@ -518,7 +518,7 @@ public class jTPCC implements jTPCCConfig
 			
 						String terminalName = "Term-" + (i>=9 ? ""+(i+1) : "0"+(i+1));
 						Connection conn = null;
-						printMessage("Creating database connection for " + terminalName + "...");
+						debugMessage("Creating database connection for " + terminalName + "...");
 						
 						try {
 							conn = DriverManager.getConnection(database, dbProps);
@@ -541,7 +541,7 @@ public class jTPCC implements jTPCCConfig
 		
 						terminals[i] = terminal;
 						terminalNames[i] = terminalName;
-						printMessage(terminalName + "\t" + terminalWarehouseID);
+						debugMessage(terminalName + "\t" + terminalWarehouseID);
 					}
 		
 					sessionEndTargetTime = executionTimeMillis;
@@ -795,6 +795,21 @@ public class jTPCC implements jTPCCConfig
 	log.error("Term-00, "+ message);
     }
 
+	private void infoMessage(String message)
+	{
+		log.info("Term-00, "+ message);
+	}
+
+	private void debugMessage(String message)
+	{
+		log.debug("Term-00, "+ message);
+	}
+
+	private void warnMessage(String message)
+	{
+		log.warn("Term-00, "+ message);
+	}
+
     private void exit()
     {
 	System.exit(0);
@@ -837,9 +852,10 @@ public class jTPCC implements jTPCCConfig
 			long totalMem = Runtime.getRuntime().totalMemory() / (1024*1024);
 			fmt.format("    Memory Usage: %dMB / %dMB          ", (totalMem - freeMem), totalMem);
 	
-			System.out.print(informativeText);
-			for (int count = 0; count < 1+informativeText.length(); count++)
-				System.out.print("\b");
+			infoMessage(informativeText.toString());
+//			System.out.print(informativeText);
+//			for (int count = 0; count < 1+informativeText.length(); count++)
+//				System.out.print("\b");
 		}
     }
 }

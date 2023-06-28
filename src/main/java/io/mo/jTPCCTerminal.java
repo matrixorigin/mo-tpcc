@@ -133,21 +133,21 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
 		executeTransactions(numTransactions);
 		try
 		{
-			printMessage("");
-			printMessage("Closing statement and connection...");
+			debugMessage("");
+			debugMessage("Closing statement and connection...");
 	
 			stmt.close();
 			conn.close();
 		}
 		catch(Exception e)
 		{
-			printMessage("");
-			printMessage("An error occurred!");
+			errorMessage("");
+			errorMessage("An error occurred!");
 			logException(e);
 		}
 
-		printMessage("");
-		printMessage("Terminal \'" + terminalName + "\' finished after " + (transactionCount-1) + " transaction(s).");
+		debugMessage("");
+		debugMessage("Terminal \'" + terminalName + "\' finished after " + (transactionCount-1) + " transaction(s).");
 
 		parent.signalTerminalEnded(this, newOrderCounter);
     }
@@ -155,18 +155,18 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
     public void stopRunningWhenPossible()
     {
 		stopRunningSignal = true;
-		printMessage("");
-		printMessage("Terminal received stop signal!");
-		printMessage("Finishing current transaction before exit...");
+		debugMessage("");
+		debugMessage("Terminal received stop signal!");
+		debugMessage("Finishing current transaction before exit...");
     }
 
     private void executeTransactions(int numTransactions)
     {
 		boolean stopRunning = false;
 		if(numTransactions != -1)
-			printMessage("Executing " + numTransactions + " transactions...");
+			debugMessage("Executing " + numTransactions + " transactions...");
 		else
-			printMessage("Executing for a limited time...");
+			debugMessage("Executing for a limited time...");
 
 		for(int i = 0; (i < numTransactions || numTransactions == -1) && !stopRunning; i++)
 		{
@@ -397,9 +397,28 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
 
 
     private void printMessage(String message) {
-	//log.trace(terminalName + ", " + message);
 		log.info(terminalName + ", " + message);
     }
+
+	private void errorMessage(String message)
+	{
+		log.error("Term-00, "+ message);
+	}
+
+	private void infoMessage(String message)
+	{
+		log.info("Term-00, "+ message);
+	}
+
+	private void debugMessage(String message)
+	{
+		log.debug("Term-00, "+ message);
+	}
+
+	private void warnMessage(String message)
+	{
+		log.warn("Term-00, "+ message);
+	}
 
 
     void transRollback () {

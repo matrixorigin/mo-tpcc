@@ -1,17 +1,17 @@
 db=mo
 driver=com.mysql.cj.jdbc.Driver
-conn=jdbc:mysql://127.0.0.1:6001/tpcc?characterSetResults=utf8&continueBatchOnError=false&useServerPrepStmts=true&alwaysSendSetIsolation=false&useLocalSessionState=true&zeroDateTimeBehavior=CONVERT_TO_NULL&failoverReadOnly=false&serverTimezone=Asia/Shanghai&useSSL=false&socketTimeout=30000
+conn=jdbc:mysql://127.0.0.1:6001/tpcc?characterSetResults=utf8&continueBatchOnError=false&useServerPrepStmts=true&alwaysSendSetIsolation=false&useLocalSessionState=true&zeroDateTimeBehavior=CONVERT_TO_NULL&failoverReadOnly=false&serverTimezone=Asia/Shanghai&useSSL=false&socketTimeout=60000
 user=dump
 password=111
 
 warehouses=1
 loadWorkers=4
 
-terminals=5
+terminals=10
 //To run specified transactions per terminal- runMins must equal zero
 runTxnsPerTerminal=0
 //To run for specified minutes- runTxnsPerTerminal must equal zero
-runMins=10
+runMins=1
 //Number of total transactions per minute
 limitTxnsPerMin=0
 
@@ -40,6 +40,6 @@ resultDirectory=./report/my_result_%tY-%tm-%td_%tH%tM%tS
 expectedErrorCodes=20619
 
 //only for profile collection
-profAddr=127.0.0.1
+profAddr=127.0.0.1,127.0.0.2
 profPort=6060
 profThink=120

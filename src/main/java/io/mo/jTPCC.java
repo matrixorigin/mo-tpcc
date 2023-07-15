@@ -537,7 +537,7 @@ public class jTPCC implements jTPCCConfig
 						 conn, dbType,
 						 transactionsPerTerminal, terminalWarehouseFixed,
 						 paymentWeightValue, orderStatusWeightValue,
-						 deliveryWeightValue, stockLevelWeightValue, numWarehouses, limPerMin_Terminal, this);
+						 deliveryWeightValue, stockLevelWeightValue, numWarehouses, limPerMin_Terminal, database,dbProps,this);
 		
 						terminals[i] = terminal;
 						terminalNames[i] = terminalName;

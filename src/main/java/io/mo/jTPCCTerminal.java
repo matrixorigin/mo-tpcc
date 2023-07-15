@@ -369,6 +369,9 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
 					log.error("Terminal \'" + terminalName + "\'" + " can not get valid connection" +
 							", this terminal will stop....");
 					stopRunning = true;
+				}else {
+					log.info("Terminal \'" + terminalName + "\'" + " has re-connected to server" +
+							", this terminal will continue....");
 				}
 			}
 		}

@@ -344,6 +344,8 @@ public class jTPCCConnection
 	public void reConnect(){
 		for(int i = 0; i < 3; i++) {
 			try {
+				if(!this.dbConn.isClosed())
+					this.dbConn.close();
 				this.dbConn = DriverManager.getConnection(this.jdbcURL,this.dbProps);
 				prepareStmt();
 				dbConn.setAutoCommit(false);

@@ -405,10 +405,16 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
-				" W_ID=" + newOrder.w_id +
-				" D_ID=" + newOrder.d_id +
-				" C_ID=" + newOrder.c_id + " NOT FOUND");
+			log.info("[EXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
+					" W_ID=" + newOrder.w_id +
+					" D_ID=" + newOrder.d_id +
+					" C_ID=" + newOrder.c_id + " NOT FOUND");
+			db.rollback();
+			return;
+//			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
+//				" W_ID=" + newOrder.w_id +
+//				" D_ID=" + newOrder.d_id +
+//				" C_ID=" + newOrder.c_id + " NOT FOUND");
 	    }
 	    newOrder.w_tax      = rs.getDouble("w_tax");
 	    newOrder.c_last     = rs.getString("c_last");
@@ -488,8 +494,12 @@ public class jTPCCTData
 				}
 	
 				// This ITEM should have been there.
-				throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
+				log.info("[EXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
 						" NOT FOUND");
+				db.rollback();
+				return;
+//				throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
+//						" NOT FOUND");
 		}
 		// Found ITEM
 		newOrder.i_name[seq] = rs.getString("i_name");
@@ -504,10 +514,16 @@ public class jTPCCTData
 		rs = stmt.executeQuery();
 		if (!rs.next())
 		{
-		    throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
-				" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
-				" S_I_ID=" + newOrder.ol_i_id[seq] +
-				" NOT FOUND");
+			log.info("[EXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
+					" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
+					" S_I_ID=" + newOrder.ol_i_id[seq] +
+					" NOT FOUND");
+			db.rollback();
+			return;
+//		    throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
+//				" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
+//				" S_I_ID=" + newOrder.ol_i_id[seq] +
+//				" NOT FOUND");
 		}
 		newOrder.s_quantity[seq] = rs.getInt("s_quantity");
 		// Leave the ResultSet open ... we need it for the s_dist_NN.

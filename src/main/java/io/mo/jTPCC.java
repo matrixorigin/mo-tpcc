@@ -530,8 +530,6 @@ public class jTPCC implements jTPCCConfig
 							errorMessage("The program now will stop, and please check the error");
 							System.exit(1);
 						}
-						
-						conn.setAutoCommit(false);
 		
 						jTPCCTerminal terminal = new jTPCCTerminal(terminalName, terminalWarehouseID, terminalDistrictID,
 						 conn, dbType,
@@ -542,6 +540,9 @@ public class jTPCC implements jTPCCConfig
 						terminals[i] = terminal;
 						terminalNames[i] = terminalName;
 						debugMessage(terminalName + "\t" + terminalWarehouseID);
+
+						
+						
 					}
 		
 					sessionEndTargetTime = executionTimeMillis;

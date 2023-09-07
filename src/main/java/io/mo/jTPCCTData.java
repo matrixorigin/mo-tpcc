@@ -387,9 +387,11 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]: District for" +
+			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: District for" +
 				" W_ID=" + newOrder.w_id +
 				" D_ID=" + newOrder.d_id + " NOT FOUND");
+			db.rollback();
+			return;
 	    }
 	    newOrder.d_tax      = rs.getDouble("d_tax");
 	    newOrder.o_id       = rs.getInt("d_next_o_id");
@@ -405,7 +407,7 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			log.info("[EXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
+			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
 					" W_ID=" + newOrder.w_id +
 					" D_ID=" + newOrder.d_id +
 					" C_ID=" + newOrder.c_id + " NOT FOUND");
@@ -494,7 +496,7 @@ public class jTPCCTData
 				}
 	
 				// This ITEM should have been there.
-				log.info("[EXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
+				log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
 						" NOT FOUND");
 				db.rollback();
 				return;
@@ -514,7 +516,7 @@ public class jTPCCTData
 		rs = stmt.executeQuery();
 		if (!rs.next())
 		{
-			log.info("[EXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
+			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
 					" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
 					" S_I_ID=" + newOrder.ol_i_id[seq] +
 					" NOT FOUND");
@@ -820,9 +822,11 @@ public class jTPCCTData
 			if (!rs.next())
 			{
 				rs.close();
-				throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: District for" +
+				log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: District for" +
 					" W_ID=" + payment.w_id +
 					" D_ID=" + payment.d_id + " NOT FOUND");
+				db.rollback();
+				return;
 			}
 			payment.d_name = rs.getString("d_name");
 			payment.d_street_1 = rs.getString("d_street_1");
@@ -849,9 +853,11 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			rs.close();
-			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Warehouse for" +
+				rs.close();
+				log.error("[EXPECTED][TT_PAYMENT][EXECUTION]: Warehouse for" +
 				" W_ID=" + payment.w_id + " NOT FOUND");
+				db.rollback();
+				return;
 			}
 			payment.w_name = rs.getString("w_name");
 			payment.w_street_1 = rs.getString("w_street_1");
@@ -886,10 +892,12 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Customer(s) for" +
+					log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer(s) for" +
 						" C_W_ID=" + payment.c_w_id +
 						" C_D_ID=" + payment.c_d_id +
 						" C_LAST=" + payment.c_last + " NOT FOUND");
+					db.rollback();
+					return;
 				}
 	
 				payment.c_id = c_id_list.get((c_id_list.size() + 1) / 2 - 1);
@@ -903,10 +911,12 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Customer for" +
+				log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer for" +
 				" C_W_ID=" + payment.c_w_id +
 				" C_D_ID=" + payment.c_d_id +
 				" C_ID=" + payment.c_id + " NOT FOUND");
+				db.rollback();
+				return;
 			}
 			payment.c_first = rs.getString("c_first");
 			payment.c_middle = rs.getString("c_middle");
@@ -949,10 +959,12 @@ public class jTPCCTData
 				rs = stmt.executeQuery();
 				if (!rs.next())
 				{
-					throw new Exception("[EXPECTED][TT_PAYMENT][EXECUTION]: Customer.c_data for" +
+					log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer.c_data for" +
 					" C_W_ID=" + payment.c_w_id +
 					" C_D_ID=" + payment.c_d_id +
 					" C_ID=" + payment.c_id + " NOT FOUND");
+					db.rollback();
+					return;
 				}
 				payment.c_data = rs.getString("c_data");
 				rs.close();
@@ -1217,10 +1229,12 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]: Customer(s) for" +
+					log.error("[UNEXPECTED][ORDER_STATUS][EXECUTION]: Customer(s) for" +
 						" C_W_ID=" + orderStatus.w_id +
 						" C_D_ID=" + orderStatus.d_id +
 						" C_LAST=" + orderStatus.c_last + " NOT FOUND");
+					db.rollback();
+					return;
 				}
 	
 				orderStatus.c_id = c_id_list.get((c_id_list.size() + 1) / 2 - 1);
@@ -1234,10 +1248,12 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]: Customer for" +
+				log.error("[EXPECTED][ORDER_STATUS][EXECUTION]: Customer for" +
 					" C_W_ID=" + orderStatus.w_id +
 					" C_D_ID=" + orderStatus.d_id +
 					" C_ID=" + orderStatus.c_id + " NOT FOUND");
+				db.rollback();
+				return;
 			}
 			orderStatus.c_first = rs.getString("c_first");
 			orderStatus.c_middle = rs.getString("c_middle");
@@ -1257,10 +1273,12 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			throw new Exception("[EXPECTED][ORDER_STATUS][EXECUTION]: Last Order for" +
-				" W_ID=" + orderStatus.w_id +
-				" D_ID=" + orderStatus.d_id +
-				" C_ID=" + orderStatus.c_id + " NOT FOUND");
+				log.error("[EXPECTED][ORDER_STATUS][EXECUTION]: Last Order for" +
+					" W_ID=" + orderStatus.w_id +
+					" D_ID=" + orderStatus.d_id +
+					" C_ID=" + orderStatus.c_id + " NOT FOUND");
+				db.rollback();
+				return;
 			}
 			orderStatus.o_id = rs.getInt("o_id");
 			orderStatus.o_entry_d = rs.getTimestamp("o_entry_d").toString();
@@ -1458,7 +1476,7 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-			throw new Exception("Failed to get low-stock for" +
+				throw new Exception("Failed to get low-stock for" +
 						" W_ID=" + stockLevel.w_id +
 						" D_ID=" + stockLevel.d_id);
 			}
@@ -1753,10 +1771,12 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]: ORDER in DELIVERY_BG for" +
-			" O_W_ID=" + deliveryBG.w_id +
-			" O_D_ID=" + d_id +
-			" O_ID=" + o_id + " NOT FOUND");
+		    log.error("[EXPECTED][DELIVERY_BG][EXECUTION]: ORDER in DELIVERY_BG for" +
+				" O_W_ID=" + deliveryBG.w_id +
+				" O_D_ID=" + d_id +
+				" O_ID=" + o_id + " NOT FOUND");
+			db.rollback();
+			return;
 		}
 		c_id = rs.getInt("o_c_id");
 		rs.close();
@@ -1778,10 +1798,12 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    throw new Exception("[EXPECTED][DELIVERY_BG][EXECUTION]: sum(OL_AMOUNT) for ORDER_LINEs with " +
-			" OL_W_ID=" + deliveryBG.w_id +
-			" OL_D_ID=" + d_id +
-			" OL_O_ID=" + o_id + " NOT FOUND");
+		    log.error("[EXPECTED][DELIVERY_BG][EXECUTION]: sum(OL_AMOUNT) for ORDER_LINEs with " +
+				" OL_W_ID=" + deliveryBG.w_id +
+				" OL_D_ID=" + d_id +
+				" OL_O_ID=" + o_id + " NOT FOUND");
+			db.rollback();
+			return;
 		}
 		sum_ol_amount = rs.getDouble("sum_ol_amount");
 		rs.close();

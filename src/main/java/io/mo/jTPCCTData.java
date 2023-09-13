@@ -387,11 +387,15 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: District for" +
-				" W_ID=" + newOrder.w_id +
-				" D_ID=" + newOrder.d_id + " NOT FOUND");
-			db.rollback();
-			return;
+			RowNotFoundException exception = new RowNotFoundException(
+					String.format("District for W_ID = %d and D_ID = %d not found.", 
+							newOrder.w_id,newOrder.d_id));
+			throw exception;
+//			
+//			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: District for" +
+//				" W_ID=" + newOrder.w_id +
+//				" D_ID=" + newOrder.d_id + " NOT FOUND");
+//			return;
 	    }
 	    newOrder.d_tax      = rs.getDouble("d_tax");
 	    newOrder.o_id       = rs.getInt("d_next_o_id");
@@ -407,16 +411,17 @@ public class jTPCCTData
 	    if (!rs.next())
 	    {
 			rs.close();
-			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
-					" W_ID=" + newOrder.w_id +
-					" D_ID=" + newOrder.d_id +
-					" C_ID=" + newOrder.c_id + " NOT FOUND");
-			db.rollback();
-			return;
-//			throw new SQLException("[EXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
-//				" W_ID=" + newOrder.w_id +
-//				" D_ID=" + newOrder.d_id +
-//				" C_ID=" + newOrder.c_id + " NOT FOUND");
+			RowNotFoundException exception = new RowNotFoundException(
+					String.format("Warehouse or Customer for W_ID = %d and D_ID = %d and C_ID= %d not found.",
+							newOrder.w_id,newOrder.d_id,newOrder.c_id));
+			throw exception;
+//			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: Warehouse or Customer for" +
+//					" W_ID=" + newOrder.w_id +
+//					" D_ID=" + newOrder.d_id +
+//					" C_ID=" + newOrder.c_id + " NOT FOUND");
+//			db.rollback();
+//			return;
+
 	    }
 	    newOrder.w_tax      = rs.getDouble("w_tax");
 	    newOrder.c_last     = rs.getString("c_last");
@@ -496,12 +501,14 @@ public class jTPCCTData
 				}
 	
 				// This ITEM should have been there.
-				log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
-						" NOT FOUND");
-				db.rollback();
-				return;
-//				throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
+				RowNotFoundException exception = new RowNotFoundException(
+						String.format("Item for I_ID = %d not found.",
+								newOrder.ol_i_id[seq]));
+				throw exception;
+//				log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: ITEM " + newOrder.ol_i_id[seq] +
 //						" NOT FOUND");
+//				db.rollback();
+//				return;
 		}
 		// Found ITEM
 		newOrder.i_name[seq] = rs.getString("i_name");
@@ -516,16 +523,17 @@ public class jTPCCTData
 		rs = stmt.executeQuery();
 		if (!rs.next())
 		{
-			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
-					" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
-					" S_I_ID=" + newOrder.ol_i_id[seq] +
-					" NOT FOUND");
-			db.rollback();
-			return;
-//		    throw new Exception("[EXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
-//				" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
-//				" S_I_ID=" + newOrder.ol_i_id[seq] +
-//				" NOT FOUND");
+			rs.close();
+			RowNotFoundException exception = new RowNotFoundException(
+					String.format("Stock for S_W_ID = %d and S_I_ID = %d not found.",
+							newOrder.ol_supply_w_id[seq],newOrder.ol_i_id[seq]));
+			throw exception;
+//			log.error("[UNEXPECTED][TT_NEW_ORDER][EXECUTION]: STOCK with" +
+//					" S_W_ID=" + newOrder.ol_supply_w_id[seq] +
+//					" S_I_ID=" + newOrder.ol_i_id[seq] +
+//					" NOT FOUND");
+//			db.rollback();
+//			return;
 		}
 		newOrder.s_quantity[seq] = rs.getInt("s_quantity");
 		// Leave the ResultSet open ... we need it for the s_dist_NN.
@@ -640,6 +648,23 @@ public class jTPCCTData
 			throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 		else
 			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
+	}
+	catch (RowNotFoundException re){
+		try
+		{
+			db.stmtNewOrderUpdateStock.clearBatch();
+			db.stmtNewOrderInsertOrderLine.clearBatch();
+			db.rollback();
+		}
+		catch (SQLException se2)
+		{
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
+		}
+
+		if(isExpectedErrorCode(re.getErrorCode()))
+			throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
+		else
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
 	}
 	catch (Exception e)
 	{
@@ -822,11 +847,15 @@ public class jTPCCTData
 			if (!rs.next())
 			{
 				rs.close();
-				log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: District for" +
-					" W_ID=" + payment.w_id +
-					" D_ID=" + payment.d_id + " NOT FOUND");
-				db.rollback();
-				return;
+				RowNotFoundException exception = new RowNotFoundException(
+						String.format("District for W_ID = %d and D_ID = %d not found.",
+								payment.w_id,payment.d_id));
+				throw exception;
+//				log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: District for" +
+//					" W_ID=" + payment.w_id +
+//					" D_ID=" + payment.d_id + " NOT FOUND");
+//				db.rollback();
+//				return;
 			}
 			payment.d_name = rs.getString("d_name");
 			payment.d_street_1 = rs.getString("d_street_1");
@@ -854,10 +883,14 @@ public class jTPCCTData
 			if (!rs.next())
 			{
 				rs.close();
-				log.error("[EXPECTED][TT_PAYMENT][EXECUTION]: Warehouse for" +
-				" W_ID=" + payment.w_id + " NOT FOUND");
-				db.rollback();
-				return;
+				RowNotFoundException exception = new RowNotFoundException(
+						String.format("Warehouse for W_ID = %d not found.",
+								payment.w_id));
+				throw exception;
+//				log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Warehouse for" +
+//				" W_ID=" + payment.w_id + " NOT FOUND");
+//				db.rollback();
+//				return;
 			}
 			payment.w_name = rs.getString("w_name");
 			payment.w_street_1 = rs.getString("w_street_1");
@@ -865,19 +898,9 @@ public class jTPCCTData
 			payment.w_city = rs.getString("w_city");
 			payment.w_state = rs.getString("w_state");
 			payment.w_zip = rs.getString("w_zip");
-			/**
-			 * test code
-			 */
-//			ResultSet sumDis = db.stmtSumDistrict.executeQuery("select d_w_id, sum(d_ytd) from bmsql_district group by d_w_id");
-//			sumDis.next();
-//			String wytd = rs.getString("w_ytd");
-//			String sum_d_ytd = sumDis.getString(2);
-//			System.out.println("wid="+payment.w_id+",wytd="+wytd+", sum_d_ytd="+sum_d_ytd+", incr="+payment.h_amount);
+	
 			rs.close();
 			
-			//test code
-			
-	
 			// If C_LAST is given instead of C_ID (60%), determine the C_ID.
 			if (payment.c_last != null)
 			{
@@ -892,12 +915,16 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer(s) for" +
-						" C_W_ID=" + payment.c_w_id +
-						" C_D_ID=" + payment.c_d_id +
-						" C_LAST=" + payment.c_last + " NOT FOUND");
-					db.rollback();
-					return;
+					RowNotFoundException exception = new RowNotFoundException(
+							String.format("Customer(s) for C_W_ID = %d and C_D_ID = %d and C_LAST = %s not found.",
+									payment.c_w_id,payment.c_d_id,payment.c_last));
+					throw exception;
+//					log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer(s) for" +
+//						" C_W_ID=" + payment.c_w_id +
+//						" C_D_ID=" + payment.c_d_id +
+//						" C_LAST=" + payment.c_last + " NOT FOUND");
+//					db.rollback();
+//					return;
 				}
 	
 				payment.c_id = c_id_list.get((c_id_list.size() + 1) / 2 - 1);
@@ -911,12 +938,16 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer for" +
-				" C_W_ID=" + payment.c_w_id +
-				" C_D_ID=" + payment.c_d_id +
-				" C_ID=" + payment.c_id + " NOT FOUND");
-				db.rollback();
-				return;
+				RowNotFoundException exception = new RowNotFoundException(
+						String.format("Customer for C_W_ID = %d and C_D_ID = %d and C_ID = %d not found.",
+								payment.c_w_id,payment.c_d_id,payment.c_id));
+				throw exception;
+//				log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer for" +
+//				" C_W_ID=" + payment.c_w_id +
+//				" C_D_ID=" + payment.c_d_id +
+//				" C_ID=" + payment.c_id + " NOT FOUND");
+//				db.rollback();
+//				return;
 			}
 			payment.c_first = rs.getString("c_first");
 			payment.c_middle = rs.getString("c_middle");
@@ -959,12 +990,16 @@ public class jTPCCTData
 				rs = stmt.executeQuery();
 				if (!rs.next())
 				{
-					log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer.c_data for" +
-					" C_W_ID=" + payment.c_w_id +
-					" C_D_ID=" + payment.c_d_id +
-					" C_ID=" + payment.c_id + " NOT FOUND");
-					db.rollback();
-					return;
+					RowNotFoundException exception = new RowNotFoundException(
+							String.format("Customer.c_data for C_W_ID = %d and C_D_ID = %d and C_ID = %d not found.",
+									payment.c_w_id,payment.c_d_id,payment.c_id));
+					throw exception;
+//					log.error("[UNEXPECTED][TT_PAYMENT][EXECUTION]: Customer.c_data for" +
+//					" C_W_ID=" + payment.c_w_id +
+//					" C_D_ID=" + payment.c_d_id +
+//					" C_ID=" + payment.c_id + " NOT FOUND");
+//					db.rollback();
+//					return;
 				}
 				payment.c_data = rs.getString("c_data");
 				rs.close();
@@ -1032,6 +1067,21 @@ public class jTPCCTData
 			else
 				throw new Exception(String.format("[UNEXPECTED][TT_PAYMENT][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 			
+		}
+		catch (RowNotFoundException re){
+			try
+			{
+				db.rollback();
+			}
+			catch (SQLException se2)
+			{
+				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
+			}
+
+			if(isExpectedErrorCode(re.getErrorCode()))
+				throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
+			else
+				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
 		}
 		catch (Exception e)
 		{
@@ -1229,12 +1279,16 @@ public class jTPCCTData
 	
 				if (c_id_list.size() == 0)
 				{
-					log.error("[UNEXPECTED][ORDER_STATUS][EXECUTION]: Customer(s) for" +
-						" C_W_ID=" + orderStatus.w_id +
-						" C_D_ID=" + orderStatus.d_id +
-						" C_LAST=" + orderStatus.c_last + " NOT FOUND");
-					db.rollback();
-					return;
+					RowNotFoundException exception = new RowNotFoundException(
+							String.format("Customer(s) for C_W_ID = %d and C_D_ID = %d and C_LAST = %s not found.",
+									orderStatus.w_id,orderStatus.d_id,orderStatus.c_last));
+					throw exception;
+//					log.error("[UNEXPECTED][ORDER_STATUS][EXECUTION]: Customer(s) for" +
+//						" C_W_ID=" + orderStatus.w_id +
+//						" C_D_ID=" + orderStatus.d_id +
+//						" C_LAST=" + orderStatus.c_last + " NOT FOUND");
+//					db.rollback();
+//					return;
 				}
 	
 				orderStatus.c_id = c_id_list.get((c_id_list.size() + 1) / 2 - 1);
@@ -1248,12 +1302,16 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				log.error("[EXPECTED][ORDER_STATUS][EXECUTION]: Customer for" +
-					" C_W_ID=" + orderStatus.w_id +
-					" C_D_ID=" + orderStatus.d_id +
-					" C_ID=" + orderStatus.c_id + " NOT FOUND");
-				db.rollback();
-				return;
+				RowNotFoundException exception = new RowNotFoundException(
+						String.format("Customer for C_W_ID = %d and C_D_ID = %d and C_ID = %d not found.",
+								orderStatus.w_id,orderStatus.d_id,orderStatus.c_id));
+				throw exception;
+//				log.error("[UNEXPECTED][ORDER_STATUS][EXECUTION]: Customer for" +
+//					" C_W_ID=" + orderStatus.w_id +
+//					" C_D_ID=" + orderStatus.d_id +
+//					" C_ID=" + orderStatus.c_id + " NOT FOUND");
+//				db.rollback();
+//				return;
 			}
 			orderStatus.c_first = rs.getString("c_first");
 			orderStatus.c_middle = rs.getString("c_middle");
@@ -1273,12 +1331,16 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				log.error("[EXPECTED][ORDER_STATUS][EXECUTION]: Last Order for" +
-					" W_ID=" + orderStatus.w_id +
-					" D_ID=" + orderStatus.d_id +
-					" C_ID=" + orderStatus.c_id + " NOT FOUND");
-				db.rollback();
-				return;
+				RowNotFoundException exception = new RowNotFoundException(
+						String.format("Last Order for W_ID = %d and D_ID = %d and C_ID = %d not found.",
+								orderStatus.w_id,orderStatus.d_id,orderStatus.c_id));
+				throw exception;
+//				log.error("[UNEXPECTED][ORDER_STATUS][EXECUTION]: Last Order for" +
+//					" W_ID=" + orderStatus.w_id +
+//					" D_ID=" + orderStatus.d_id +
+//					" C_ID=" + orderStatus.c_id + " NOT FOUND");
+//				db.rollback();
+//				return;
 			}
 			orderStatus.o_id = rs.getInt("o_id");
 			orderStatus.o_entry_d = rs.getTimestamp("o_entry_d").toString();
@@ -1347,18 +1409,33 @@ public class jTPCCTData
 			else
 				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 		}
-	catch (Exception e)
-	{
-	    try
-	    {
-		db.rollback();
-	    }
-	    catch (SQLException se2)
-	    {
-			throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
-	    }
-	    throw e;
-	}
+		catch (RowNotFoundException re){
+			try
+			{
+				db.rollback();
+			}
+			catch (SQLException se2)
+			{
+				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
+			}
+
+			if(isExpectedErrorCode(re.getErrorCode()))
+				throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
+			else
+				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
+		}
+		catch (Exception e)
+		{
+			try
+			{
+			db.rollback();
+			}
+			catch (SQLException se2)
+			{
+				throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
+			}
+			throw e;
+		}
     }
 
     private void traceOrderStatus(Logger log, Formatter fmt[])
@@ -1771,12 +1848,16 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    log.error("[EXPECTED][DELIVERY_BG][EXECUTION]: ORDER in DELIVERY_BG for" +
-				" O_W_ID=" + deliveryBG.w_id +
-				" O_D_ID=" + d_id +
-				" O_ID=" + o_id + " NOT FOUND");
-			db.rollback();
-			return;
+			RowNotFoundException exception = new RowNotFoundException(
+					String.format("Order for O_W_ID = %d and O_D_ID = %d and O_ID = %d not found.",
+							deliveryBG.w_id,d_id,o_id));
+			throw exception;
+//		    log.error("[UNEXPECTED][DELIVERY_BG][EXECUTION]: ORDER in DELIVERY_BG for" +
+//				" O_W_ID=" + deliveryBG.w_id +
+//				" O_D_ID=" + d_id +
+//				" O_ID=" + o_id + " NOT FOUND");
+//			db.rollback();
+//			return;
 		}
 		c_id = rs.getInt("o_c_id");
 		rs.close();
@@ -1798,12 +1879,16 @@ public class jTPCCTData
 		if (!rs.next())
 		{
 		    rs.close();
-		    log.error("[EXPECTED][DELIVERY_BG][EXECUTION]: sum(OL_AMOUNT) for ORDER_LINEs with " +
-				" OL_W_ID=" + deliveryBG.w_id +
-				" OL_D_ID=" + d_id +
-				" OL_O_ID=" + o_id + " NOT FOUND");
-			db.rollback();
-			return;
+			RowNotFoundException exception = new RowNotFoundException(
+					String.format("sum(OL_AMOUNT) of ORDER_LINEs for O_W_ID = %d and O_D_ID = %d and OL_O_ID = %d not found.",
+							deliveryBG.w_id,d_id,o_id));
+			throw exception;
+//		    log.error("[UNEXPECTED][DELIVERY_BG][EXECUTION]: sum(OL_AMOUNT) for ORDER_LINEs with " +
+//				" OL_W_ID=" + deliveryBG.w_id +
+//				" OL_D_ID=" + d_id +
+//				" OL_O_ID=" + o_id + " NOT FOUND");
+//			db.rollback();
+//			return;
 		}
 		sum_ol_amount = rs.getDouble("sum_ol_amount");
 		rs.close();
@@ -1846,6 +1931,21 @@ public class jTPCCTData
 			throw new Exception(String.format("[EXPECTED][DELIVERY_BG][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
 		else
 			throw new Exception(String.format("[UNEXPECTED][DELIVERY_BG][EXECUTION] ErrorCode : %d, ErrorMessage : %s",se.getErrorCode(),se.getMessage()));
+	}
+	catch (RowNotFoundException re){
+		try
+		{
+			db.rollback();
+		}
+		catch (SQLException se2)
+		{
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][ROLLBACK] ErrorCode : %d, ErrorMessage : %s",se2.getErrorCode(),se2.getMessage()));
+		}
+
+		if(isExpectedErrorCode(re.getErrorCode()))
+			throw new Exception(String.format("[EXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
+		else
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][EXECUTION] ErrorCode : %d, ErrorMessage : %s",re.getErrorCode(),re.getMessage()));
 	}
 	catch (Exception e)
 	{

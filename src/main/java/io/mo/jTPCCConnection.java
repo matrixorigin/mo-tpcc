@@ -325,6 +325,7 @@ public class jTPCCConnection
 			 if(!this.dbConn.isValid(30)) {
 				 log.error("The connection has not been valid.");
 				 this.valid = false;
+				 
 			 }
 			 
 		} catch (SQLException e) {

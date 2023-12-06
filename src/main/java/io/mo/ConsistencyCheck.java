@@ -41,7 +41,7 @@ public class ConsistencyCheck {
         dbProps.setProperty("user", iUser);
         dbProps.setProperty("password", iPassword);
         Connection conn = null;
-        
+        String currentQuery = null;
         try {
             Class.forName(iDriver);
             
@@ -57,6 +57,7 @@ public class ConsistencyCheck {
             try {
                 Statement stmt = conn.createStatement();
                 for(String query : queries){
+                    currentQuery = query;
                     ResultSet resultSet = stmt.executeQuery(query);
                     String error = "";
                     int colcount = resultSet.getMetaData().getColumnCount();
@@ -92,6 +93,7 @@ public class ConsistencyCheck {
                 }
             }catch (SQLException e){
                 log.error(e.getMessage());
+                log.error("SQL: " + currentQuery);
                 success = false;
             }
         } catch (ClassNotFoundException e) {

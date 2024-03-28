@@ -618,6 +618,8 @@ public class jTPCC implements jTPCCConfig
 				}
 				catch(Exception e1)
 				{
+					e1.printStackTrace();
+					errorMessage(e1.getMessage());
 					errorMessage("This session ended with errors!");
 					printStreamReport.close();
 					fileOutputStream.close();

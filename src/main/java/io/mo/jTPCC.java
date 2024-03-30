@@ -533,7 +533,9 @@ public class jTPCC implements jTPCCConfig
 						 transactionsPerTerminal, terminalWarehouseFixed,
 						 paymentWeightValue, orderStatusWeightValue,
 						 deliveryWeightValue, stockLevelWeightValue, numWarehouses, limPerMin_Terminal, database,dbProps,this);
-						terminal.setConn_id(getConnId(conn));
+						String conn_id = getConnId(conn);
+						terminal.setConn_id(conn_id);
+						infoMessage(String.format("Connection[%s] has been initialized, and start to run benchmark txn..",conn_id));
 						conn.setAutoCommit(false);
 		
 						terminals[i] = terminal;

@@ -9,10 +9,7 @@ package io.mo;/*
  */
 
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.Properties;
 
 public class jTPCCUtil implements jTPCCConfig
@@ -77,6 +74,8 @@ public class jTPCCUtil implements jTPCCConfig
             stmtGetConfig = dbConn.prepareStatement(
             "SELECT cfg_value FROM bmsql_config " +
             " WHERE cfg_name = ?");
+            String conn_id = getConnId(dbConn);
+            System.out.println(String.format("Connection[%s] has been initialized, and start to get config..",conn_id));
         }
         
         stmtGetConfig.setString(1, option);
@@ -89,6 +88,19 @@ public class jTPCCUtil implements jTPCCConfig
         rs.close();
     
 	    return value;
+    }
+
+    public static String getConnId(Connection connection){
+        try {
+            Statement queryConnId = connection.createStatement();
+            ResultSet resultSet = queryConnId.executeQuery("select connection_id();");
+            if(resultSet.next())
+                return resultSet.getString(1);
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 } // end jTPCCUtil

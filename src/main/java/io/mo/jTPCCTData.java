@@ -628,9 +628,10 @@ public class jTPCCTData
 //	    for (SQLException x = se; x != null; x = x.getNextException())
 //			log.error(x.getMessage());
 //	    se.printStackTrace();
+		
 		db.checkStatus();
 		if(!db.isValid()){
-			throw new Exception("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection has not been valid, caused by: "+se.getMessage());
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection[%s] has not been valid, caused by: %s",db.getConn_id(),se.getMessage()));
 		}
 		
 	    try
@@ -1050,7 +1051,7 @@ public class jTPCCTData
 //			se.printStackTrace();
 			db.checkStatus();
 			if(!db.isValid()){
-				throw new Exception("[UNEXPECTED][TT_PAYMENT][CONNECTION] The connection has not been valid, caused by: "+se.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection[%s] has not been valid, caused by: %s",db.getConn_id(),se.getMessage()));
 			}
 	
 			try
@@ -1392,7 +1393,7 @@ public class jTPCCTData
 
 			db.checkStatus();
 			if(!db.isValid()){
-				throw new Exception("[UNEXPECTED][ORDER_STATUS][CONNECTION] The connection has not been valid, caused by: "+se.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection[%s] has not been valid, caused by: %s",db.getConn_id(),se.getMessage()));
 			}
 			
 			try
@@ -1570,7 +1571,7 @@ public class jTPCCTData
 //			se.printStackTrace();
 			db.checkStatus();
 			if(!db.isValid()){
-				throw new Exception("[UNEXPECTED][STOCK_LEVEL][CONNECTION] The connection has not been valid, caused by: "+se.getMessage());
+				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection[%s] has not been valid, caused by: %s",db.getConn_id(),se.getMessage()));
 			}
 			
 			try
@@ -1915,7 +1916,7 @@ public class jTPCCTData
 //	    se.printStackTrace();
 		db.checkStatus();
 		if(!db.isValid()){
-			throw new Exception("[UNEXPECTED][DELIVERY_BG][CONNECTION] The connection has not been valid, caused by: "+se.getMessage());
+			throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection[%s] has not been valid, caused by: %s",db.getConn_id(),se.getMessage()));
 		}
 		
 	    try

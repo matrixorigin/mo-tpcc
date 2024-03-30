@@ -48,6 +48,8 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
     jTPCCConnection     db = null;
     int                 dbType = 0;
 
+	private String conn_id = null;
+
     public jTPCCTerminal
       (String terminalName, int terminalWarehouseID, int terminalDistrictID,
        Connection conn, int dbType,
@@ -442,6 +444,12 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
 	}
     } // end transCommit()
 
+	public String getConn_id() {
+		return conn_id;
+	}
 
-
+	public void setConn_id(String conn_id) {
+		this.conn_id = conn_id;
+		this.db.setConn_id(conn_id);
+	}
 }

@@ -11,10 +11,7 @@ import org.apache.log4j.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Formatter;
@@ -536,7 +533,7 @@ public class jTPCC implements jTPCCConfig
 						 transactionsPerTerminal, terminalWarehouseFixed,
 						 paymentWeightValue, orderStatusWeightValue,
 						 deliveryWeightValue, stockLevelWeightValue, numWarehouses, limPerMin_Terminal, database,dbProps,this);
-						
+						terminal.setConn_id(getConnId(conn));
 						conn.setAutoCommit(false);
 		
 						terminals[i] = terminal;
@@ -863,4 +860,17 @@ public class jTPCC implements jTPCCConfig
 //				System.out.print("\b");
 		}
     }
+	
+	public String getConnId(Connection connection){
+		try {
+			Statement queryConnId = connection.createStatement();
+			ResultSet resultSet = queryConnId.executeQuery("select connection_id();");
+			if(resultSet.next())
+				return resultSet.getString(1);
+			return null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

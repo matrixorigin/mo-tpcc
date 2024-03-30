@@ -65,6 +65,8 @@ public class jTPCCConnection
 	//test code
 	public Statement stmtSumDistrict;
 
+	private String conn_id = null;
+
 	private static org.apache.log4j.Logger log = Logger.getLogger(jTPCCConnection.class);
 
     public jTPCCConnection(Connection dbConn, int dbType)
@@ -72,7 +74,6 @@ public class jTPCCConnection
     {
 	this.dbConn = dbConn;
 	this.dbType = dbType;
-	
 	//test code
 	stmtSumDistrict = dbConn.createStatement();
 
@@ -318,14 +319,13 @@ public class jTPCCConnection
 	public void checkStatus(){
 		try {
 			 if(this.dbConn.isClosed()) {
-				 log.error("The connection has been closed.");
+				 log.error(String.format("The connection[%s] has been closed.",conn_id));
 				 this.valid = false;
 			 }
 			 
 			 if(!this.dbConn.isValid(30)) {
-				 log.error("The connection has not been valid.");
+				 log.error(String.format("The connection[%s] has not been valid.",conn_id));
 				 this.valid = false;
-				 
 			 }
 			 
 		} catch (SQLException e) {
@@ -587,5 +587,13 @@ public class jTPCCConnection
 						"    SET c_balance = c_balance + ?, " +
 						"        c_delivery_cnt = c_delivery_cnt + 1 " +
 						"    WHERE c_w_id = ? AND c_d_id = ? AND c_id = ?");
+	}
+
+	public String getConn_id() {
+		return conn_id;
+	}
+
+	public void setConn_id(String conn_id) {
+		this.conn_id = conn_id;
 	}
 }

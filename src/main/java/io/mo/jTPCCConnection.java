@@ -348,6 +348,9 @@ public class jTPCCConnection
 				if(!this.dbConn.isClosed())
 					this.dbConn.close();
 				this.dbConn = DriverManager.getConnection(this.jdbcURL,this.dbProps);
+				String new_conn_id = getConnId(dbConn);
+				System.out.println(String.format("The new connection[%s] has been established, and the old connection[%s] has been closed.",new_conn_id,this.conn_id));
+				setConn_id(new_conn_id);
 				prepareStmt();
 				dbConn.setAutoCommit(false);
 				this.valid = true;
@@ -595,5 +598,18 @@ public class jTPCCConnection
 
 	public void setConn_id(String conn_id) {
 		this.conn_id = conn_id;
+	}
+
+	public String getConnId(Connection connection){
+		try {
+			Statement queryConnId = connection.createStatement();
+			ResultSet resultSet = queryConnId.executeQuery("select connection_id();");
+			if(resultSet.next())
+				return resultSet.getString(1);
+			return null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

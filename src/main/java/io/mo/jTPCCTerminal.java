@@ -257,6 +257,7 @@ public class jTPCCTerminal implements jTPCCConfig, Runnable
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 					log.fatal(e.getMessage());
 					txnError = true;
 					//e.printStackTrace();

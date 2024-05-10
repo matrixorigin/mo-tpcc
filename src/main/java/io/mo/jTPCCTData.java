@@ -1369,6 +1369,9 @@ public class jTPCCTData
 				else
 					orderStatus.ol_delivery_d[ol_idx] = null;
 				ol_idx++;
+				if(ol_idx >= 15){
+					throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][EXECUTION] The count of orderline is more than 15 for [ol_w_id = %d and ol_d_id = %d and ol_o_id = %d]",orderStatus.w_id,orderStatus.d_id,orderStatus.o_id));
+				}
 			}
 			rs.close();
 	

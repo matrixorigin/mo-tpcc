@@ -1357,6 +1357,17 @@ public class jTPCCTData
 			rs = stmt.executeQuery();
 			while (rs.next())
 			{
+				if(ol_idx >= 15){
+					log.error(String.format("Wrong orderline item for [ol_i_id = %d and ol_supply_w_id = %d and ol_quantity = %d and ol_amount = %f and ol_delivery_d = %s]",
+							rs.getInt("ol_i_id"),rs.getInt("ol_supply_w_id"),rs.getInt("ol_quantity"),rs.getDouble("ol_amount"),rs.getTimestamp("ol_delivery_d") == null?"null":rs.getTimestamp("ol_delivery_d").toString()));
+					
+					for(int i = 0; i <= ol_idx;i++){
+						log.error(String.format("orderStatus.ol_i_id[%d] = %d in item[ol_w_id = %d and ol_d_id = %d and ol_o_id = %d]",i,orderStatus.ol_i_id[i],orderStatus.w_id,orderStatus.d_id,orderStatus.o_id));
+					}
+					
+					throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][EXECUTION] The count of orderline is more than 10 for [ol_w_id = %d and ol_d_id = %d and ol_o_id = %d]",orderStatus.w_id,orderStatus.d_id,orderStatus.o_id));
+				}
+				
 				Timestamp       ol_delivery_d;
 		
 				orderStatus.ol_i_id[ol_idx] = rs.getInt("ol_i_id");
@@ -1368,10 +1379,9 @@ public class jTPCCTData
 					orderStatus.ol_delivery_d[ol_idx] = ol_delivery_d.toString();
 				else
 					orderStatus.ol_delivery_d[ol_idx] = null;
+				
 				ol_idx++;
-				if(ol_idx >= 15){
-					throw new Exception(String.format("[UNEXPECTED][ORDER_STATUS][EXECUTION] The count of orderline is more than 15 for [ol_w_id = %d and ol_d_id = %d and ol_o_id = %d]",orderStatus.w_id,orderStatus.d_id,orderStatus.o_id));
-				}
+				
 			}
 			rs.close();
 	

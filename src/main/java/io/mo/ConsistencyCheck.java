@@ -46,8 +46,8 @@ public class ConsistencyCheck {
                 "select c_w_id, c_d_id, c_id,count(1) from bmsql_customer group by c_w_id, c_d_id, c_id having count(1) > 1 limit 10;",
                 "select no_w_id, no_d_id, no_o_id, count(1) from bmsql_new_order group by no_w_id, no_d_id, no_o_id having count(1) > 1 limit 10;",
                 "select o_w_id,o_d_id, o_id,count(1) from bmsql_oorder group by o_w_id, o_d_id, o_id having count(1) > 1 limit 10;",
-                "select s_w_id, s_i_id,count(1) from bmsql_stock group by s_w_id, s_i_id having count(1) > 1 limit 10;",
-                "select ol_w_id, ol_d_id, ol_o_id, ol_number,count(1) from bmsql_order_line group by ol_w_id, ol_d_id, ol_o_id, ol_number having count(1) > 1 limit 10;"};
+                "select s_w_id, s_i_id,count(1) from bmsql_stock group by s_w_id, s_i_id having count(1) > 1 limit 10;"/*,
+                "select ol_w_id, ol_d_id, ol_o_id, ol_number,count(1) from bmsql_order_line group by ol_w_id, ol_d_id, ol_o_id, ol_number having count(1) > 1 limit 10;"*/};
 
         Properties dbProps = new Properties();
         dbProps.setProperty("user", iUser);

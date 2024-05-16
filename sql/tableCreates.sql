@@ -18,7 +18,7 @@ create table bmsql_warehouse (
   w_state     char(2),
   w_zip       char(9),
   primary key (w_id)
-) PARTITION BY KEY(w_id);
+);
 
 create table bmsql_district (
   d_w_id       integer       not null,
@@ -33,7 +33,7 @@ create table bmsql_district (
   d_state      char(2),
   d_zip        char(9),
   primary key (d_w_id, d_id)
-) PARTITION BY KEY(d_w_id);
+);
 
 create table bmsql_customer (
   c_w_id         integer        not null,
@@ -58,7 +58,7 @@ create table bmsql_customer (
   c_middle       char(2),
   c_data         varchar(500),
   primary key (c_w_id, c_d_id, c_id)
-) PARTITION BY KEY(c_w_id);
+);
 
 create table bmsql_history (
   hist_id  integer auto_increment,
@@ -78,7 +78,7 @@ create table bmsql_new_order (
   no_d_id  integer   not null,
   no_o_id  integer   not null,
   primary key (no_w_id, no_d_id, no_o_id)
-) PARTITION BY KEY(no_w_id);
+) ;
 
 create table bmsql_oorder (
   o_w_id       integer      not null,
@@ -90,7 +90,7 @@ create table bmsql_oorder (
   o_all_local  integer,
   o_entry_d    timestamp,
   primary key (o_w_id, o_d_id, o_id)
-) PARTITION BY KEY(o_w_id);
+) ;
 
 create table bmsql_order_line (
   ol_w_id         integer   not null,
@@ -104,7 +104,7 @@ create table bmsql_order_line (
   ol_quantity     integer,
   ol_dist_info    char(24),
   primary key (ol_w_id, ol_d_id, ol_o_id, ol_number)
-) PARTITION BY KEY(ol_w_id);
+) ;
 
 create table bmsql_item (
   i_id     integer      not null,
@@ -113,7 +113,7 @@ create table bmsql_item (
   i_data   varchar(50),
   i_im_id  integer,
   primary key (i_id)
-) PARTITION BY KEY(i_id);
+) ;
 
 create table bmsql_stock (
   s_w_id       integer       not null,
@@ -134,6 +134,6 @@ create table bmsql_stock (
   s_dist_09    char(24),
   s_dist_10    char(24),
   primary key (s_w_id, s_i_id)
-) PARTITION BY KEY(s_w_id);
+);
 
 

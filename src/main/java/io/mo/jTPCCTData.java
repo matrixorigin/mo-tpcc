@@ -1584,7 +1584,7 @@ public class jTPCCTData
 //			se.printStackTrace();
 			db.checkStatus();
 			if(!db.isValid()){
-				throw new Exception(String.format("[UNEXPECTED][TT_NEW_ORDER][CONNECTION] The connection[%s] has not been valid, caused by: %s",db.getConn_id(),se.getMessage()));
+				throw new Exception(String.format("[UNEXPECTED][STOCK_LEVEL][CONNECTION] The connection[%s] has not been valid, caused by: %s",db.getConn_id(),se.getMessage()));
 			}
 			
 			try
@@ -1818,6 +1818,7 @@ public class jTPCCTData
 		    rc = stmt2.executeUpdate();
 		    if (rc == 0)
 		    {
+			
 			/*
 			 * Failed to delete the NEW_ORDER row. This is not
 			 * an error since for concurrency reasons we did

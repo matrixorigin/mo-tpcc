@@ -357,7 +357,7 @@ public class jTPCCConnection
 				break;
 			} catch (SQLException e) {
 				try {
-					Thread.sleep(10000);
+					Thread.sleep(60000);
 				} catch (InterruptedException ex) {
 					throw new RuntimeException(ex);
 				}

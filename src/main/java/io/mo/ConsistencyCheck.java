@@ -151,7 +151,25 @@ public class ConsistencyCheck {
                     } catch (SQLException e) {
                         log.error(e.getMessage());
                         log.error("SQL: " + currentQuery);
+                        
                         success = false;
+                    }
+                    
+                    if(conn.isClosed() || conn.isValid(30)){
+                        for(int i = 0; i < 3; i++) {
+                            try {
+                                conn = DriverManager.getConnection(iConn, dbProps);
+                                break;
+                            }catch (SQLException e){
+                                log.error(e.getMessage());
+                               Thread.sleep(60000); 
+                            }
+                        }
+                        
+                        if(conn == null || conn.isClosed() || conn.isValid(30)){
+                            log.error("Can not get valid connection for data consistency checking, program will exit.");
+                            System.exit(1);
+                        }
                     }
 
                     Thread.sleep(interval*1000);
@@ -161,6 +179,8 @@ public class ConsistencyCheck {
             log.error("Could not find driver " + iDriver);
             System.exit(1);
         } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 

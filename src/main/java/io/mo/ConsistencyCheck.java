@@ -155,7 +155,7 @@ public class ConsistencyCheck {
                         success = false;
                     }
                     
-                    if(conn.isClosed() || conn.isValid(30)){
+                    if(conn.isClosed() || !conn.isValid(30)){
                         for(int i = 0; i < 3; i++) {
                             try {
                                 conn = DriverManager.getConnection(iConn, dbProps);
@@ -166,7 +166,7 @@ public class ConsistencyCheck {
                             }
                         }
                         
-                        if(conn == null || conn.isClosed() || conn.isValid(30)){
+                        if(conn == null || conn.isClosed() || !conn.isValid(30)){
                             log.error("Can not get valid connection for data consistency checking, program will exit.");
                             System.exit(1);
                         }

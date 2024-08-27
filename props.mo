@@ -11,7 +11,7 @@ terminals=10
 //To run specified transactions per terminal- runMins must equal zero
 runTxnsPerTerminal=0
 //To run for specified minutes- runTxnsPerTerminal must equal zero
-runMins=1
+runMins=5
 //Number of total transactions per minute
 limitTxnsPerMin=0
 

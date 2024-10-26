@@ -536,6 +536,7 @@ public class jTPCC implements jTPCCConfig
 						String conn_id = getConnId(conn);
 						terminal.setConn_id(conn_id);
 						infoMessage(String.format("Connection[%s] has been initialized, and start to run benchmark txn..",conn_id));
+						infoMessage(String.format("Connection Info[connId=%s, wid=%d, did=%d]",conn_id,terminalWarehouseID,terminalDistrictID));
 						conn.setAutoCommit(false);
 		
 						terminals[i] = terminal;

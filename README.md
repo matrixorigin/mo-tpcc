@@ -37,7 +37,7 @@ And these Opertions must be executed step by step as the following descriptions,
   //the number of warehouse
   warehouses=1
   loadWorkers=4
-  
+
   //the num of terminals that will simultaneously run
   //must be less than warehouses*10
   terminals=1
@@ -57,11 +57,11 @@ And these Opertions must be executed step by step as the following descriptions,
 
 **Third,you should generate and load TPC-C data to by the command:**
 
-`./runLoader.sh props.mo warehouse 10`
+`./runLoader.sh props.mo warehouses 10`
 
 If only need to generate data, use command:
 
-`./runLoader.sh props.mo warehouse 10 filelocation /yourpath/`
+`./runLoader.sh props.mo warehouses 10 filelocation /yourpath/`
 
 **Then，you can run TPC-C benchmark by the commands:**
 

@@ -17,7 +17,7 @@ limitTxnsPerMin=0
 
 //Set to true to run in 4.x compatible mode. Set to false to use the
 //entire configured database evenly.
-terminalWarehouseFixed=false
+terminalWarehouseFixed=true
 
 //The following five values must add up to 100
 //The default percentages of 45, 43, 4, 4 & 4 match the TPC-C spec
